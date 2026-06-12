@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Typing Animation</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0d0d0d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    overflow: hidden;
+    font-family: "Microsoft YaHei", "PingFang SC", "JetBrains Mono", "Fira Code", monospace;
+  }
+  .wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 60px;
+  }
+  .container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .background-glow {
+    position: absolute;
+    width: 500px;
+    height: 200px;
+    background: radial-gradient(ellipse, rgba(0,200,255,0.06) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .typing-area {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    font-size: 64px;
+    font-weight: 600;
+    letter-spacing: 6px;
+    color: #e8e8e8;
+    text-shadow: 0 0 40px rgba(255,255,255,0.25), 0 0 80px rgba(0,200,255,0.12);
+    position: relative;
+  }
+  .cursor {
+    display: inline-block;
+    width: 4px;
+    height: 64px;
+    background: #00c8ff;
+    margin-left: 2px;
+    box-shadow: 0 0 12px #00c8ff, 0 0 24px rgba(0,200,255,0.5);
+    animation: blink 0.55s step-end infinite;
+  }
+  .cursor.paused { animation: none; opacity: 1; }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+  .qr-container {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .qr-container.show {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  .qr-container img {
+    width: 160px;
+    height: 160px;
+    border-radius: 12px;
+    background: #fff;
+    padding: 8px;
+    box-shadow: 0 0 30px rgba(0,200,255,0.2), 0 8px 32px rgba(0,0,0,0.5);
+  }
+  .qr-label {
+    color: rgba(255,255,255,0.5);
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .particles {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+  }
+  .particle {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: rgba(0,200,255,0.35);
+    border-radius: 50%;
+    animation: floatUp 4s linear infinite;
+  }
+  @keyframes floatUp {
+    0% { transform: translateY(0) scale(1); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-100vh) scale(0.3); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="particles" id="particles"></div>
+
+<div class="wrapper">
+  <div class="container">
+    <div class="background-glow"></div>
+    <div class="typing-area">
+      <span id="typed-text"></span><span class="cursor paused" id="cursor"></span>
+    </div>
+  </div>
+  <div class="qr-container" id="qr-container">
+    <img id="qr-img" src="" alt="QR Code" />
+    <span class="qr-label">SCAN TO VISIT</span>
+  </div>
+</div>
+
+<script>
+  const textEl = document.getElementById("typed-text");
+  const cursorEl = document.getElementById("cursor");
+  const qrContainer = document.getElementById("qr-container");
+  const qrImg = document.getElementById("qr-img");
+
+  // ============ Audio Engine ============
+  let audioCtx = null;
+
+  function getAudioCtx() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    return audioCtx;
+  }
+
+  // Mechanical key-click: short noise burst + low tap
+  function playKeySound() {
+    const ctx = getAudioCtx();
+    const now = ctx.currentTime;
+
+    // Noise burst for mechanical feel
+    const bufferSize = ctx.sampleRate * 0.03;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.2));
+    }
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+    const noiseGain = ctx.createGain();
+    noiseGain.gain.setValueAtTime(0.12, now);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
+    noise.connect(noiseGain);
+    noiseGain.connect(ctx.destination);
+    noise.start(now);
+    noise.stop(now + 0.03);
+
+    // High tap
+    const osc = ctx.createOscillator();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(1800, now);
+    osc.frequency.exponentialRampToValueAtTime(800, now + 0.04);
+    const oscGain = ctx.createGain();
+    oscGain.gain.setValueAtTime(0.08, now);
+    oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+    osc.connect(oscGain);
+    oscGain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.04);
+  }
+
+  // Softer backspace sound
+  function playDeleteSound() {
+    const ctx = getAudioCtx();
+    const now = ctx.currentTime;
+
+    // Softer noise
+    const bufferSize = ctx.sampleRate * 0.025;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.15));
+    }
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+    const noiseGain = ctx.createGain();
+    noiseGain.gain.setValueAtTime(0.08, now);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.025);
+    noise.connect(noiseGain);
+    noiseGain.connect(ctx.destination);
+    noise.start(now);
+    noise.stop(now + 0.025);
+
+    // Lower, softer tone
+    const osc = ctx.createOscillator();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(600, now);
+    osc.frequency.exponentialRampToValueAtTime(300, now + 0.03);
+    const oscGain = ctx.createGain();
+    oscGain.gain.setValueAtTime(0.06, now);
+    oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
+    osc.connect(oscGain);
+    oscGain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.03);
+  }
+
+  // QR reveal chime (ascending arpeggio)
+  function playQRRevealSound() {
+    const ctx = getAudioCtx();
+    const now = ctx.currentTime;
+    const notes = [523, 659, 784, 1047]; // C5 E5 G5 C6
+
+    notes.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      osc.type = "sine";
+      osc.frequency.value = freq;
+      const gain = ctx.createGain();
+      const startTime = now + i * 0.1;
+      gain.gain.setValueAtTime(0, startTime);
+      gain.gain.linearRampToValueAtTime(0.1, startTime + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.5);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(startTime);
+      osc.stop(startTime + 0.5);
+    });
+
+    // Soft pad underneath
+    const pad = ctx.createOscillator();
+    pad.type = "sine";
+    pad.frequency.value = 261;
+    const padGain = ctx.createGain();
+    padGain.gain.setValueAtTime(0, now);
+    padGain.gain.linearRampToValueAtTime(0.05, now + 0.1);
+    padGain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+    pad.connect(padGain);
+    padGain.connect(ctx.destination);
+    pad.start(now);
+    pad.stop(now + 0.8);
+  }
+
+  // ============ Particles ============
+  const particlesContainer = document.getElementById("particles");
+  for (let i = 0; i < 30; i++) {
+    const p = document.createElement("div");
+    p.className = "particle";
+    p.style.left = Math.random() * 100 + "%";
+    p.style.bottom = "-10px";
+    p.style.animationDelay = Math.random() * 4 + "s";
+    p.style.animationDuration = (3 + Math.random() * 3) + "s";
+    particlesContainer.appendChild(p);
+  }
+
+  // ============ Animation ============
+  const TYPE_SPEED = 160;
+  const DELETE_SPEED = 110;
+  const PAUSE_AFTER_TYPE = 700;
+  const PAUSE_AFTER_DELETE = 500;
+  const INITIAL_PAUSE = 800;
+  const FINAL_PAUSE = 2500;
+
+  const firstWord = "原来是这样数据库";
+  const secondWord = "example.com";
+
+  function sleep(ms) {
+    return new Promise(r => setTimeout(r, ms));
+  }
+
+  async function typeWord(word, speed) {
+    cursorEl.classList.remove("paused");
+    for (let i = 0; i < word.length; i++) {
+      textEl.textContent = word.substring(0, i + 1);
+      playKeySound();
+      await sleep(speed);
+    }
+  }
+
+  async function deleteWord(word, speed) {
+    for (let i = word.length; i > 0; i--) {
+      textEl.textContent = word.substring(0, i - 1);
+      playDeleteSound();
+      await sleep(speed);
+    }
+  }
+
+  async function runAnimation() {
+    qrImg.src = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=example.com&margin=10";
+
+    // Warm up AudioContext on first user interaction (page load counts)
+    getAudioCtx();
+
+    // Initial pause
+    cursorEl.classList.add("paused");
+    textEl.textContent = "";
+    await sleep(INITIAL_PAUSE);
+
+    // Type first word
+    await typeWord(firstWord, TYPE_SPEED);
+    await sleep(PAUSE_AFTER_TYPE);
+
+    // Delete first word
+    await deleteWord(firstWord, DELETE_SPEED);
+    await sleep(PAUSE_AFTER_DELETE);
+
+    // Type second word
+    await typeWord(secondWord, TYPE_SPEED);
+    await sleep(600);
+
+    // QR reveal
+    qrContainer.classList.add("show");
+    playQRRevealSound();
+    await sleep(FINAL_PAUSE);
+  }
+
+  runAnimation();
+</script>
+
+</body>
+</html>
