@@ -78,7 +78,7 @@ export default function Navbar() {
     const result = await supabase
       .from("episodes")
       .select("id, title, episode_number")
-      .or("title.ilike.%25"+searchQuery+"%25,transcript.ilike.%25"+searchQuery+"%25")
+      .or(`title.ilike.%${searchQuery}%,transcript.ilike.%${searchQuery}%`)
       .limit(5) as { data: SearchResult[] | null; error: unknown };
     setResults(result.data ?? []);
   };
