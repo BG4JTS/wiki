@@ -108,6 +108,15 @@ export interface PitFill {
   user_profile?: UserProfile | null;
 }
 
+export interface BgmSong {
+  id: number;
+  episode_id: number;
+  timestamp_sec: number;
+  title: string;
+  artist: string;
+  created_at: string;
+}
+
 export type Database = {
   public: {
     Tables: {

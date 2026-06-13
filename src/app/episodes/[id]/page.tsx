@@ -5,6 +5,7 @@ import TimelineViewer from "@/components/TimelineViewer";
 import CommentsSection from "@/components/CommentsSection";
 import UserContributions from "@/components/UserContributions";
 import PitSection from "@/components/PitSection";
+import BGMPlaylist from "@/components/BGMPlaylist";
 import WikiEditor from "@/components/WikiEditor";
 
 // ---- 类型定义 ----
@@ -88,6 +89,7 @@ export default async function EpisodePage({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-8">
           {timelines.length > 0 && <TimelineViewer timelines={timelines} />}
+          <BGMPlaylist episodeId={episode.id} />
           <TranscriptViewer transcript={episode.transcript} />
           <CommentsSection episodeId={episode.id} />
         </div>
