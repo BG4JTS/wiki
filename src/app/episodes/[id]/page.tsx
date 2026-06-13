@@ -40,20 +40,26 @@ export default async function EpisodePage({
   const { id } = await params;
   const supabase = await createClient();
 
-  const epResult = await supabase
-    .from("episodes")
-    .select("*")
-    .eq("id", id)
-    .single();
-  const episode = epResult.data as EpisodeData | null;
-  if (!episode) notFound();
+  let episode: EpisodeData | null = null;
+  let timelines: TimelineData[] = [];
+  try {
+    const epResult = await supabase
+      .from("episodes")
+      .select("*")
+      .eq("id", id)
+      .single();
+    episode = epResult.data as EpisodeData | null;
 
-  const tlResult = await supabase
-    .from("timelines")
-    .select("*")
-    .eq("episode_id", id)
-    .order("timestamp_sec");
-  const timelines = (tlResult.data ?? []) as TimelineData[];
+    const tlResult = await supabase
+      .from("timelines")
+      .select("*")
+      .eq("episode_id", id)
+      .order("timestamp_sec");
+    timelines = (tlResult.data ?? []) as TimelineData[];
+  } catch {
+    // query failed, show not found
+  }
+  if (!episode) notFound();
 
   return (
     <div>

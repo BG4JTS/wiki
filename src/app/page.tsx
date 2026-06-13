@@ -23,15 +23,19 @@ export default async function HomePage({
   const to = from + PAGE_SIZE - 1;
 
   const supabase = await createClient();
-  const epResult = await supabase
-    .from("episodes")
-    .select("id, episode_number, title, publish_date, duration, description", {
-      count: "exact",
-    })
-    .order("episode_number", { ascending: false })
-    .range(from, to);
-  const episodes = (epResult.data ?? []) as EpisodeItem[];
-  const totalPages = Math.ceil((epResult.count || 0) / PAGE_SIZE);
+  let episodes: EpisodeItem[] = [];
+  let totalPages = 0;
+  try {
+    const epResult = await supabase
+      .from("episodes")
+      .select("id, episode_number, title, publish_date, duration, description", {
+        count: "exact",
+      })
+      .order("episode_number", { ascending: false })
+      .range(from, to);
+    episodes = (epResult.data ?? []) as EpisodeItem[];
+    totalPages = Math.ceil((epResult.count || 0) / PAGE_SIZE);
+  } catch { /* query failed, show empty */ }
 
   return (
     <div>
