@@ -27,18 +27,18 @@ CREATE POLICY "site_settings_update" ON site_settings FOR UPDATE USING (auth.rol
 CREATE OR REPLACE FUNCTION clear_all_data()
 RETURNS TEXT AS $$
 BEGIN
-  DELETE FROM pit_fill_votes;
-  DELETE FROM pit_votes;
-  DELETE FROM pit_fills;
-  DELETE FROM pits;
-  DELETE FROM topic_votes;
-  DELETE FROM topics;
-  DELETE FROM bgm_songs;
-  DELETE FROM user_contributions;
-  DELETE FROM comments;
-  DELETE FROM timelines;
-  DELETE FROM episodes;
-  DELETE FROM site_settings;
+  DELETE FROM pit_fill_votes WHERE true;
+  DELETE FROM pit_votes WHERE true;
+  DELETE FROM pit_fills WHERE true;
+  DELETE FROM pits WHERE true;
+  DELETE FROM topic_votes WHERE true;
+  DELETE FROM topics WHERE true;
+  DELETE FROM bgm_songs WHERE true;
+  DELETE FROM user_contributions WHERE true;
+  DELETE FROM comments WHERE true;
+  DELETE FROM timelines WHERE true;
+  DELETE FROM episodes WHERE true;
+  DELETE FROM site_settings WHERE true;
   INSERT INTO site_settings (key, value) VALUES ('auto_approve_episodes', 'false');
   RETURN 'ok';
 END;
