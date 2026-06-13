@@ -33,7 +33,7 @@ BEGIN
   DELETE FROM pits WHERE true;
   DELETE FROM topic_votes WHERE true;
   DELETE FROM topics WHERE true;
-  DELETE FROM bgm_songs WHERE true;
+  DELETE FROM bgm_playlist WHERE true;
   DELETE FROM user_contributions WHERE true;
   DELETE FROM comments WHERE true;
   DELETE FROM timelines WHERE true;
