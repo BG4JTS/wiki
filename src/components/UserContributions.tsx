@@ -31,7 +31,7 @@ export default function UserContributions({
       .eq("episode_id", episodeId)
       .order("votes", { ascending: false })
       .order("created_at", { ascending: false }) as { data: UserContribution[] | null; error: { message: string } | null };
-    let data = result.data; const error = result.error;
+    const data = result.data; const error = result.error;
 
     if (error) setError(error.message);
     else     // 批量获取用户资料

@@ -29,7 +29,7 @@ export default function CommentsSection({ episodeId }: { episodeId: number }) {
       .select("*")
       .eq("episode_id", episodeId)
       .order("created_at", { ascending: true }) as { data: CommentWithReplies[] | null; error: { message: string } | null };
-    let data = result.data; const error = result.error;
+    const data = result.data; const error = result.error;
 
     if (error) {
       setError(error.message);
