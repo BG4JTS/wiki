@@ -10,7 +10,7 @@ interface EpisodeItem {
   publish_date: string;
   duration: number;
   description: string;
-  status: string;
+  status?: string;
 }
 
 export default async function HomePage({
@@ -27,15 +27,25 @@ export default async function HomePage({
   let episodes: EpisodeItem[] = [];
   let totalPages = 0;
   try {
-    const epResult = await supabase
-      .from("episodes")
-      .select("id, episode_number, title, publish_date, duration, description, status", {
-        count: "exact",
-      })
-      .eq("status", "published")
-      .order("episode_number", { ascending: false })
-      .range(from, to);
-    episodes = (epResult.data ?? []) as EpisodeItem[];
+    // 先尝试按 status 筛选已发布；字段不存在则降级为全量
+    let epResult;
+    try {
+      epResult = await supabase
+        .from("episodes")
+        .select("id, episode_number, title, publish_date, duration, description, status", { count: "exact" })
+        .eq("status", "published")
+        .order("episode_number", { ascending: false })
+        .range(from, to);
+    } catch {
+      epResult = await supabase
+        .from("episodes")
+        .select("id, episode_number, title, publish_date, duration, description", { count: "exact" })
+        .order("episode_number", { ascending: false })
+        .range(from, to);
+    }
+    const allData = (epResult.data ?? []) as EpisodeItem[];
+    // JS 层再次过滤（防御 status 字段不存在的情况）
+    episodes = allData.filter(ep => !ep.status || ep.status === "published");
     totalPages = Math.ceil((epResult.count || 0) / PAGE_SIZE);
   } catch { /* query failed, show empty */ }
 

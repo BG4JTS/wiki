@@ -29,11 +29,23 @@ export default async function AdminPage() {
 
   let episodes: AdminEpisodeItem[] = [];
   try {
-    const epResult = await supabase
-      .from("episodes")
-      .select("id, episode_number, title, status")
-      .order("episode_number", { ascending: false });
-    episodes = (epResult.data ?? []) as AdminEpisodeItem[];
+    // 先尝试带 status 查询，字段不存在则降级
+    let epResult;
+    try {
+      epResult = await supabase
+        .from("episodes")
+        .select("id, episode_number, title, status")
+        .order("episode_number", { ascending: false });
+    } catch {
+      epResult = await supabase
+        .from("episodes")
+        .select("id, episode_number, title")
+        .order("episode_number", { ascending: false });
+    }
+    episodes = ((epResult.data ?? []) as AdminEpisodeItem[]).map(ep => ({
+      ...ep,
+      status: ep.status || "published",
+    }));
   } catch {
     episodes = [];
   }
