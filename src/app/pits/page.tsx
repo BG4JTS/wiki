@@ -19,7 +19,7 @@ export default function PitsPage() {
 
   const load = async () => {
     const r = await supabase.from("pits").select("*").order("up_votes",{ascending:false}).limit(100) as { data:PitItem[]|null; error:unknown };
-    let data = r.data ?? [];
+    const data = r.data ?? [];
 
     const epIds = [...new Set(data.filter(p=>p.episode_id).map(p=>p.episode_id!))];
     if(epIds.length){
