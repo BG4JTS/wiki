@@ -46,6 +46,31 @@ export default function AboutPage() {
         </div>
       </div>
 
+
+      {/* 赞助 */}
+      <div className="doc-section" style={{borderColor: "#f59e0b"}}>
+        <h3 className="doc-section-title" style={{color: "#b45309", borderBottomColor: "#f59e0b"}}>⚡ 赞助服务器</h3>
+        <p className="text-sm text-ink-500 leading-relaxed mb-4">
+          本站由 <a href="https://bg4jts.cn" target="_blank" rel="noopener noreferrer" className="text-ink-700 font-semibold underline underline-offset-2">BG4JTS</a> 独立开发维护，
+          与《原来是这样?!》节目及上海SMG东方广播中心<strong>无任何从属关系</strong>。
+          你的赞助<strong>不会</strong>到达旭岽或节目团队，将全部用于服务器续费、域名和咖啡。
+        </p>
+        <a
+          href="https://blog.bg4jts.cn/support"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn inline-flex text-sm font-bold"
+          style={{background:"#f59e0b", borderColor:"#f59e0b", color:"#1a1a1a"}}
+        >
+          💛 赞助 BG4JTS
+        </a>
+        <p className="text-ink-300 text-xs mt-4 leading-relaxed">
+          本站由 <a href="https://deepseek.com" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">DeepSeek V4</a> 协助开发 —
+          你看到的这个页面，有 87.3% 的代码是它在凌晨 3 点写的。
+          剩下 12.7% 是我改 bug 改到凌晨 4 点。
+        </p>
+      </div>
+
       {/* 关于本站 */}
       <div className="doc-section">
         <h3 className="doc-section-title">关于本站</h3>
