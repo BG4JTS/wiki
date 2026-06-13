@@ -39,7 +39,7 @@ export default function AdminEditor({ episodes }: Props) {
       .from("episodes")
       .select("*")
       .eq("id", id)
-      .single()) as unknown as { data: Episode | null; error: unknown };
+      .single()) as unknown as { data: Episode | null; error: { message: string } | null };
     if (result.data) {
       setEpNum(String(result.data.episode_number));
       setTitle(result.data.title);
@@ -71,11 +71,9 @@ export default function AdminEditor({ episodes }: Props) {
     };
     let err;
     if (editId) {
-      // @ts-expect-error supabase generic
-      ({ error: err } = await (supabase.from("episodes").update(payload).eq("id", editId)) as unknown as ErrResult);
+      ({ error: err } = await (supabase.from("episodes").update(payload as never).eq("id", editId)) as unknown as ErrResult);
     } else {
-      // @ts-expect-error supabase generic
-      ({ error: err } = await (supabase.from("episodes").insert(payload)) as unknown as ErrResult);
+      ({ error: err } = await (supabase.from("episodes").insert(payload as never)) as unknown as ErrResult);
     }
     if (err) { setMessage("保存失败：" + err.message); }
     else {
@@ -99,7 +97,7 @@ export default function AdminEditor({ episodes }: Props) {
       .from("timelines")
       .select("*")
       .eq("episode_id", epId)
-      .order("timestamp_sec")) as unknown as { data: Timeline[] | null; error: unknown };
+      .order("timestamp_sec")) as unknown as { data: Timeline[] | null; error: { message: string } | null };
     setTlList(result.data ?? []);
     setTab("timeline");
   };
@@ -107,13 +105,12 @@ export default function AdminEditor({ episodes }: Props) {
   const handleAddTimeline = async () => {
     if (!tlTitle.trim() || !timelineEpId) return;
     setLoading(true);
-    // @ts-expect-error supabase generic
     const { error: err } = await (supabase.from("timelines").insert({
       episode_id: parseInt(timelineEpId),
       timestamp_sec: parseInt(tlTimestamp) || 0,
       title: tlTitle.trim(),
       description: tlDescription.trim(),
-    })) as unknown as ErrResult;
+    } as never)) as unknown as ErrResult;
     if (err) { setMessage("添加失败：" + err.message); }
     else { setTlTimestamp(""); setTlTitle(""); setTlDescription(""); handleLoadTimelines(parseInt(timelineEpId)); }
     setLoading(false);

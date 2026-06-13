@@ -34,7 +34,7 @@ export interface Comment {
   parent_id: number | null;
   likes: number;
   created_at: string;
-  user_profile?: UserProfile;
+  user_profile?: UserProfile | null;
   replies?: Comment[];
 }
 
@@ -54,7 +54,7 @@ export interface UserContribution {
   description: string;
   votes: number;
   created_at: string;
-  user_profile?: UserProfile;
+  user_profile?: UserProfile | null;
 }
 
 // ---- Row / Insert / Update 类型 ----

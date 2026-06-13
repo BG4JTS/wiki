@@ -29,7 +29,7 @@ export default function ProfileEditor({
         username,
         bio,
         avatar_url: profile?.avatar_url || "",
-      },
+      } as never,
       { onConflict: "id" }
     );
 

@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "node --require ./patch-readlink.cjs node_modules/next/dist/bin/next dev",
-    "build": "node --require ./patch-readlink.cjs node_modules/next/dist/bin/next build",
-    "start": "node --require ./patch-readlink.cjs node_modules/next/dist/bin/next start",
+    "build": "next build",
+    "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {

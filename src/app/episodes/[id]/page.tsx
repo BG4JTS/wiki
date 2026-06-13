@@ -25,11 +25,10 @@ interface TimelineData {
 }
 
 // ---- 静态路径 ----
+export const dynamicParams = true;
+
 export async function generateStaticParams() {
-  const supabase = await createClient();
-  const { data } = await supabase.from("episodes").select("id");
-  const rows = (data ?? []) as { id: number }[];
-  return rows.map((ep) => ({ id: String(ep.id) }));
+  return [];
 }
 
 // ---- 页面组件 ----

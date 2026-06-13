@@ -6,7 +6,6 @@ import type { Comment, User } from "@/types/database";
 
 interface CommentWithReplies extends Comment {
   replies?: CommentWithReplies[];
-  user_profile?: { username: string; avatar_url: string } | null;
 }
 
 export default function CommentsSection({ episodeId }: { episodeId: number }) {
@@ -29,7 +28,7 @@ export default function CommentsSection({ episodeId }: { episodeId: number }) {
       .from("comments")
       .select("*, user_profile:user_profiles(username, avatar_url)")
       .eq("episode_id", episodeId)
-      .order("created_at", { ascending: true }) as { data: CommentWithReplies[] | null; error: unknown };
+      .order("created_at", { ascending: true }) as { data: CommentWithReplies[] | null; error: { message: string } | null };
     const data = result.data; const error = result.error;
 
     if (error) {
@@ -52,13 +51,12 @@ export default function CommentsSection({ episodeId }: { episodeId: number }) {
     if (!content.trim() || !user) return;
 
     setError("");
-    // @ts-expect-error supabase generic
     const { error } = await supabase.from("comments").insert({
       episode_id: episodeId,
       user_id: user.id,
       content: content.trim(),
       parent_id: parentId,
-    });
+    } as never);
 
     if (error) {
       setError(error.message);
@@ -75,7 +73,6 @@ export default function CommentsSection({ episodeId }: { episodeId: number }) {
 
   const handleDelete = async (commentId: number) => {
     if (!user) return;
-    // @ts-expect-error supabase generic
     const { error } = await supabase
       .from("comments")
       .delete()

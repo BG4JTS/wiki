@@ -30,7 +30,7 @@ export default function UserContributions({
       .select("*, user_profile:user_profiles(username, avatar_url)")
       .eq("episode_id", episodeId)
       .order("votes", { ascending: false })
-      .order("created_at", { ascending: false }) as { data: UserContribution[] | null; error: unknown };
+      .order("created_at", { ascending: false }) as { data: UserContribution[] | null; error: { message: string } | null };
     const data = result.data; const error = result.error;
 
     if (error) setError(error.message);
@@ -40,14 +40,13 @@ export default function UserContributions({
 
   const handleSubmit = async () => {
     if (!content.trim() || !user) return;
-    // @ts-expect-error supabase generic
     const { error } = await supabase.from("user_contributions").insert({
       episode_id: episodeId,
       user_id: user.id,
       content_type: contentType,
       content: content.trim(),
       description: description.trim(),
-    });
+    } as never);
 
     if (error) {
       setError(error.message);
@@ -60,9 +59,7 @@ export default function UserContributions({
   };
 
   const handleVote = async (id: number) => {
-    const { error } = await supabase.rpc("increment_votes", {
-      contribution_id: id,
-    });
+    const { error } = await supabase.rpc("increment_votes", { contribution_id: id } as never);
     if (!error) loadContributions();
   };
 
