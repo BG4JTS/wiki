@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "node --require ./patch-readlink.cjs node_modules/.bin/next dev",
-    "build": "node --require ./patch-readlink.cjs node_modules/.bin/next build",
-    "start": "node --require ./patch-readlink.cjs node_modules/.bin/next start",
+    "dev": "node --require ./patch-readlink.cjs node_modules/next/dist/bin/next dev",
+    "build": "node --require ./patch-readlink.cjs node_modules/next/dist/bin/next build",
+    "start": "node --require ./patch-readlink.cjs node_modules/next/dist/bin/next start",
     "lint": "next lint"
   },
   "dependencies": {
