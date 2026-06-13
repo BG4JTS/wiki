@@ -78,6 +78,33 @@ type UserContributionRow = UserContribution;
 type UserContributionInsert = Omit<UserContributionRow, "id" | "created_at" | "votes">;
 type UserContributionUpdate = Partial<Omit<UserContributionInsert, "user_id">>;
 
+
+// ---- 坑 & 填坑 ----
+export interface Pit {
+  id: number;
+  episode_id: number | null;
+  user_id: string;
+  title: string;
+  description: string;
+  status: "open" | "pending" | "filled";
+  up_votes: number;
+  down_votes: number;
+  created_at: string;
+  user_profile?: UserProfile | null;
+}
+
+export interface PitFill {
+  id: number;
+  pit_id: number;
+  episode_id: number | null;
+  user_id: string;
+  description: string;
+  up_votes: number;
+  down_votes: number;
+  created_at: string;
+  user_profile?: UserProfile | null;
+}
+
 export type Database = {
   public: {
     Tables: {
@@ -86,6 +113,10 @@ export type Database = {
       comments: { Row: CommentRow; Insert: CommentInsert; Update: CommentUpdate; Relationships: [] };
       user_profiles: { Row: UserProfileRow; Insert: UserProfileInsert; Update: UserProfileUpdate; Relationships: [] };
       user_contributions: { Row: UserContributionRow; Insert: UserContributionInsert; Update: UserContributionUpdate; Relationships: [] };
+      pits: { Row: Pit; Insert: Omit<Pit, "id" | "created_at" | "up_votes" | "down_votes">; Update: Partial<Omit<Pit, "id" | "user_id">>; Relationships: [] };
+      pit_votes: { Row: { id: number; pit_id: number; user_id: string; vote_type: "up" | "down"; created_at: string }; Insert: Omit<{ id: number; pit_id: number; user_id: string; vote_type: "up" | "down"; created_at: string }, "id" | "created_at">; Update: never; Relationships: [] };
+      pit_fills: { Row: PitFill; Insert: Omit<PitFill, "id" | "created_at" | "up_votes" | "down_votes">; Update: Partial<Omit<PitFill, "id" | "user_id">>; Relationships: [] };
+      pit_fill_votes: { Row: { id: number; fill_id: number; user_id: string; vote_type: "up" | "down"; created_at: string }; Insert: Omit<{ id: number; fill_id: number; user_id: string; vote_type: "up" | "down"; created_at: string }, "id" | "created_at">; Update: never; Relationships: [] };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -93,3 +124,4 @@ export type Database = {
     CompositeTypes: Record<string, never>;
   };
 };
+

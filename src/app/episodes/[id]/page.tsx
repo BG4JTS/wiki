@@ -4,6 +4,7 @@ import TranscriptViewer from "@/components/TranscriptViewer";
 import TimelineViewer from "@/components/TimelineViewer";
 import CommentsSection from "@/components/CommentsSection";
 import UserContributions from "@/components/UserContributions";
+import PitSection from "@/components/PitSection";
 
 // ---- 类型定义 ----
 interface EpisodeData {
@@ -80,7 +81,10 @@ export default async function EpisodePage({
           <CommentsSection episodeId={episode.id} />
         </div>
         <div className="lg:col-span-1">
+          <div>
           <UserContributions episodeId={episode.id} />
+          <PitSection episodeId={episode.id} />
+        </div>
         </div>
       </div>
     </div>

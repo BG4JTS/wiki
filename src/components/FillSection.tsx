@@ -1,0 +1,93 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
+
+interface FillItem {
+  id: number; pit_id: number; episode_id: number | null; user_id: string;
+  description: string; up_votes: number; down_votes: number; created_at: string;
+}
+
+export default function FillSection({ pitId, pitStatus, fills, fillEpisodes, userId }: {
+  pitId: number; pitStatus: string; fills: FillItem[];
+  fillEpisodes: Map<number, string>; userId: string | null;
+}) {
+  const router = useRouter();
+  const supabase = createClient();
+  const [showForm, setShowForm] = useState(false);
+  const [desc, setDesc] = useState("");
+  const [epId, setEpId] = useState("");
+  const [error, setError] = useState("");
+
+  const handleSubmit = async () => {
+    if (!desc.trim() || !userId) return;
+    const { error: err } = await supabase.from("pit_fills").insert({
+      pit_id: pitId,
+      user_id: userId,
+      description: desc.trim(),
+      episode_id: epId ? parseInt(epId) : null,
+    } as never);
+    if (err) { setError(err.message); return; }
+    setDesc(""); setEpId(""); setShowForm(false);
+    router.refresh();
+  };
+
+  const voteFill = async (fillId: number, type: "up" | "down") => {
+    if (!userId) return;
+    const { error: err } = await supabase.rpc("vote_fill", { p_fill_id: fillId, p_vote_type: type } as never);
+    if (!error) router.refresh();
+  };
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-lg font-semibold">📝 填坑 ({fills.length})</h2>
+        {userId && pitStatus === "pending" && (
+          <button onClick={() => setShowForm(!showForm)} className="text-sm text-indigo-600 hover:underline">
+            + 填坑
+          </button>
+        )}
+      </div>
+
+      {showForm && (
+        <div className="bg-white border rounded-lg p-3 mb-3 space-y-2">
+          <textarea value={desc} onChange={e => setDesc(e.target.value)} rows={3}
+            placeholder="你的解答..." className="w-full px-2 py-1.5 text-sm border rounded focus:outline-none focus:ring-1 focus:ring-indigo-400 resize-none" />
+          <input type="number" value={epId} onChange={e => setEpId(e.target.value)}
+            placeholder="引用节目 ID（可选）" className="w-full px-2 py-1.5 text-sm border rounded focus:outline-none focus:ring-1 focus:ring-indigo-400" />
+          {error && <p className="text-xs text-red-500">{error}</p>}
+          <button onClick={handleSubmit} className="w-full py-2 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700">提交</button>
+        </div>
+      )}
+
+      {fills.length === 0 ? (
+        <p className="text-sm text-gray-400">暂无填坑</p>
+      ) : (
+        <div className="space-y-2">
+          {fills.map((f) => (
+            <div key={f.id} className="bg-white border rounded-lg p-3 text-sm">
+              <p>{f.description}</p>
+              {f.episode_id && fillEpisodes.get(f.episode_id) && (
+                <Link href={`/episodes/${f.episode_id}`} className="text-xs text-indigo-500 hover:underline mt-1 inline-block">
+                  📄 {fillEpisodes.get(f.episode_id)}
+                </Link>
+              )}
+              <div className="flex items-center gap-3 mt-2">
+                <button onClick={() => voteFill(f.id, "up")}
+                  className={`text-xs ${!userId ? "text-gray-300" : "hover:text-green-600 text-green-500"}`}>
+                  👍 {f.up_votes}
+                </button>
+                <button onClick={() => voteFill(f.id, "down")}
+                  className={`text-xs ${!userId ? "text-gray-300" : "hover:text-red-500 text-red-400"}`}>
+                  👎 {f.down_votes}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}

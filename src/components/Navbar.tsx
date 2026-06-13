@@ -72,6 +72,7 @@ export default function Navbar() {
     <nav className="bg-white shadow-sm border-b sticky top-0 z-50">
       <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
         <Link href="/" className="text-xl font-bold text-indigo-600 shrink-0">原样WIKI</Link>
+        <Link href="/pits" className="text-sm text-gray-500 hover:text-indigo-600">坑</Link>
         <div className="relative flex-1 max-w-md">
           <input type="text" placeholder="搜索节目..." value={query}
             onChange={(e) => { setQuery(e.target.value); setIsOpen(true); }}
