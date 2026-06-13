@@ -39,8 +39,8 @@ export default function UserContributions({
       const userIds = [...new Set(data.map((c) => c.user_id))];
       const pResult = await supabase
         .from("user_profiles")
-        .select("id, username, avatar_url")
-        .in("id", userIds) as { data: { id: string; username: string; avatar_url: string }[] | null; error: unknown };
+        .select("id, username, avatar_url, bio")
+        .in("id", userIds) as { data: { id: string; username: string; avatar_url: string; bio: string }[] | null; error: unknown };
       if (pResult.data) {
         const profileMap = new Map(pResult.data.map((p) => [p.id, p]));
         data.forEach((c) => { c.user_profile = profileMap.get(c.user_id) ?? null; });
