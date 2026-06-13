@@ -1,5 +1,4 @@
 // 原样WIKI 数据库类型定义
-// 与 Supabase 表结构严格对应
 
 export interface User {
   id: string;
@@ -50,7 +49,7 @@ export interface UserContribution {
   id: number;
   episode_id: number;
   user_id: string;
-  content_type: 'link' | 'note' | 'image_url';
+  content_type: "link" | "note" | "image_url";
   content: string;
   description: string;
   votes: number;
@@ -58,14 +57,35 @@ export interface UserContribution {
   user_profile?: UserProfile;
 }
 
+// ---- Row / Insert / Update 类型 ----
+type EpisodeRow = Episode;
+type EpisodeInsert = Omit<EpisodeRow, "id" | "created_at">;
+type EpisodeUpdate = Partial<EpisodeInsert>;
+
+type TimelineRow = Timeline;
+type TimelineInsert = Omit<TimelineRow, "id">;
+type TimelineUpdate = Partial<TimelineInsert>;
+
+type CommentRow = Comment;
+type CommentInsert = Omit<CommentRow, "id" | "created_at" | "likes">;
+type CommentUpdate = Partial<Omit<CommentInsert, "user_id">>;
+
+type UserProfileRow = UserProfile;
+type UserProfileInsert = Omit<UserProfileRow, "id">;
+type UserProfileUpdate = Partial<UserProfileInsert>;
+
+type UserContributionRow = UserContribution;
+type UserContributionInsert = Omit<UserContributionRow, "id" | "created_at" | "votes">;
+type UserContributionUpdate = Partial<Omit<UserContributionInsert, "user_id">>;
+
 export type Database = {
   public: {
     Tables: {
-      episodes: { Row: Episode };
-      timelines: { Row: Timeline };
-      comments: { Row: Comment };
-      user_profiles: { Row: UserProfile };
-      user_contributions: { Row: UserContribution };
+      episodes: { Row: EpisodeRow; Insert: EpisodeInsert; Update: EpisodeUpdate; Relationships: [] };
+      timelines: { Row: TimelineRow; Insert: TimelineInsert; Update: TimelineUpdate; Relationships: [] };
+      comments: { Row: CommentRow; Insert: CommentInsert; Update: CommentUpdate; Relationships: [] };
+      user_profiles: { Row: UserProfileRow; Insert: UserProfileInsert; Update: UserProfileUpdate; Relationships: [] };
+      user_contributions: { Row: UserContributionRow; Insert: UserContributionInsert; Update: UserContributionUpdate; Relationships: [] };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

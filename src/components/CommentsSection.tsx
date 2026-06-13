@@ -52,6 +52,7 @@ export default function CommentsSection({ episodeId }: { episodeId: number }) {
     if (!content.trim() || !user) return;
 
     setError("");
+    // @ts-expect-error supabase generic
     const { error } = await supabase.from("comments").insert({
       episode_id: episodeId,
       user_id: user.id,
@@ -74,6 +75,7 @@ export default function CommentsSection({ episodeId }: { episodeId: number }) {
 
   const handleDelete = async (commentId: number) => {
     if (!user) return;
+    // @ts-expect-error supabase generic
     const { error } = await supabase
       .from("comments")
       .delete()

@@ -40,6 +40,7 @@ export default function UserContributions({
 
   const handleSubmit = async () => {
     if (!content.trim() || !user) return;
+    // @ts-expect-error supabase generic
     const { error } = await supabase.from("user_contributions").insert({
       episode_id: episodeId,
       user_id: user.id,
