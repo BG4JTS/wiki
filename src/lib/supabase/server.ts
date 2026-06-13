@@ -11,7 +11,8 @@ export async function createClient() {
     {
       cookies: {
         getAll() {
-          return cookieStore.getAll();
+          try { return cookieStore.getAll(); }
+          catch { return []; }
         },
         setAll(cookiesToSet: { name: string; value: string; options?: Record<string, unknown> }[]) {
           try {
@@ -19,7 +20,7 @@ export async function createClient() {
               cookieStore.set(name, value, options)
             );
           } catch {
-            // 在 Server Component 中调用 setAll 会失败，忽略即可
+            // Server Component 中 setAll 会失败，忽略
           }
         },
       },

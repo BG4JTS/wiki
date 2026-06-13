@@ -24,11 +24,16 @@ export default async function AdminPage() {
     );
   }
 
-  const epResult = await supabase
-    .from("episodes")
-    .select("id, episode_number, title")
-    .order("episode_number", { ascending: false });
-  const episodes = (epResult.data ?? []) as AdminEpisodeItem[];
+  let episodes: AdminEpisodeItem[] = [];
+  try {
+    const epResult = await supabase
+      .from("episodes")
+      .select("id, episode_number, title")
+      .order("episode_number", { ascending: false });
+    episodes = (epResult.data ?? []) as AdminEpisodeItem[];
+  } catch {
+    episodes = [];
+  }
 
   return <AdminEditor episodes={episodes} />;
 }
