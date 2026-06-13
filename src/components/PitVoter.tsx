@@ -19,9 +19,19 @@ export default function PitVoter({ pitId, upVotes, downVotes, userId, onVoted }:
   };
 
   return (
-    <div className="flex items-center gap-3 mt-3">
-      <button onClick={() => vote("up")} className={`px-3 py-1 rounded text-sm ${!userId ? "text-gray-300" : "hover:bg-green-50 text-green-600"}`}>👍 {ups}</button>
-      <button onClick={() => vote("down")} className={`px-3 py-1 rounded text-sm ${!userId ? "text-gray-300" : "hover:bg-red-50 text-red-500"}`}>👎 {downs}</button>
+    <div className="flex items-center gap-3 mt-4">
+      <button onClick={() => vote("up")}
+        className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+          !userId ? "text-ink-300 cursor-default" : "hover:bg-green-50 text-green-600 hover:scale-105"
+        }`}>
+        👍 {ups}
+      </button>
+      <button onClick={() => vote("down")}
+        className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+          !userId ? "text-ink-300 cursor-default" : "hover:bg-red-50 text-red-500 hover:scale-105"
+        }`}>
+        👎 {downs}
+      </button>
     </div>
   );
 }

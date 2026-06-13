@@ -31,33 +31,32 @@ export default function NewPitPage() {
   };
 
   return (
-    <div className="max-w-lg mx-auto">
-      <h1 className="text-2xl font-bold mb-6">🕳 挖坑</h1>
-      {error && <div className="bg-red-50 text-red-600 p-3 rounded text-sm mb-4">{error}</div>}
+    <div className="max-w-lg mx-auto animate-fade-in-up">
+      <h1 className="text-2xl font-bold text-ink-800 mb-6">🕳 挖坑</h1>
+      {error && <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-4 border border-red-100">{error}</div>}
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium mb-1">坑标题</label>
+          <label className="block text-sm font-medium text-ink-600 mb-1.5">坑标题 *</label>
           <input type="text" value={title} onChange={e => setTitle(e.target.value)}
-            placeholder="节目里没讲清楚的问题..." className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+            placeholder="节目里没讲清楚的问题..." className="input" />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1">描述（可选）</label>
+          <label className="block text-sm font-medium text-ink-600 mb-1.5">描述（可选）</label>
           <textarea value={description} onChange={e => setDescription(e.target.value)} rows={3}
-            placeholder="补充背景信息..." className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 resize-none" />
+            placeholder="补充背景信息..." className="input resize-none" />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1">关联节目 ID（可选）</label>
+          <label className="block text-sm font-medium text-ink-600 mb-1.5">关联节目 ID（可选）</label>
           <input type="number" value={episodeId} onChange={e => setEpisodeId(e.target.value)}
-            placeholder="例如：5" className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+            placeholder="例如：5" className="input" />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1">时间戳（秒，可选）</label>
+          <label className="block text-sm font-medium text-ink-600 mb-1.5">时间戳（秒，可选）</label>
           <input type="number" value={timestampSec} onChange={e => setTimestampSec(e.target.value)}
-            placeholder="例如：3600" className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+            placeholder="例如：3600" className="input" />
         </div>
-        <button onClick={handleSubmit} disabled={loading}
-          className="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50">
-          {loading ? "提交中..." : "提交"}
+        <button onClick={handleSubmit} disabled={loading || !title.trim()} className="btn btn-primary w-full">
+          {loading ? "提交中..." : "挖坑"}
         </button>
       </div>
     </div>

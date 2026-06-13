@@ -21,15 +21,15 @@ export default async function AdminPage() {
   const adminEmail = process.env.ADMIN_EMAIL;
   if (adminEmail && user.email?.toLowerCase().trim() !== adminEmail.toLowerCase().trim()) {
     return (
-      <div className="text-center py-20">
-        <p className="text-lg text-gray-500">无权访问管理后台</p>
+      <div className="text-center py-20 animate-fade-in">
+        <p className="text-lg text-ink-500 font-medium">无权访问管理后台</p>
+        <p className="text-sm text-ink-400 mt-1">需要管理员权限</p>
       </div>
     );
   }
 
   let episodes: AdminEpisodeItem[] = [];
   try {
-    // 先尝试带 status 查询，字段不存在则降级
     let epResult;
     try {
       epResult = await supabase

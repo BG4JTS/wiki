@@ -65,57 +65,65 @@ export default function WikiEditor({ episode }: { episode: EpFields & { id: numb
   };
 
   return (
-    <div className="mb-4">
+    <div className="mb-6">
       {!editing ? (
         <div className="flex items-center gap-3 flex-wrap">
-          <button onClick={() => startEdit("all")} className="text-xs text-gray-400 hover:text-indigo-500 underline">
+          <button onClick={() => startEdit("all")} className="btn btn-ghost text-xs">
             ✏️ 编辑此节目
           </button>
           {episode.status === "draft" && (
             <button onClick={handleRequestReview} disabled={loading}
-              className="text-xs px-3 py-1 rounded bg-yellow-100 text-yellow-700 hover:bg-yellow-200 disabled:opacity-50">
+              className="btn btn-warm text-xs">
               {loading ? "提交中..." : "📤 申请发布"}
             </button>
           )}
           {episode.status === "pending" && (
-            <span className="text-xs px-2 py-0.5 rounded bg-yellow-100 text-yellow-700">⏳ 审核中</span>
+            <span className="badge badge-pending">⏳ 审核中</span>
           )}
         </div>
       ) : (
-        <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4 space-y-3">
+        <div className="card p-5 space-y-4 bg-brand-50/50 border-brand-100">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-indigo-600 font-medium">✍️ 协作编辑（所有人可参与）</span>
-            <button onClick={() => setEditing(null)} className="text-xs text-gray-400 hover:text-gray-600">取消</button>
+            <span className="text-sm font-medium text-brand-600">✍️ 协作编辑（所有人可参与）</span>
+            <button onClick={() => setEditing(null)} className="btn btn-ghost text-xs">取消</button>
           </div>
-          <div className="grid grid-cols-3 gap-3">
-            <div><label className="block text-xs font-medium mb-1">期号</label>
-              <input type="number" value={epNum} onChange={e => setEpNum(e.target.value)}
-                className="w-full px-2 py-1.5 text-sm border rounded focus:outline-none focus:ring-1 focus:ring-indigo-400" /></div>
-            <div><label className="block text-xs font-medium mb-1">日期</label>
-              <input type="date" value={publishDate} onChange={e => setPublishDate(e.target.value)}
-                className="w-full px-2 py-1.5 text-sm border rounded focus:outline-none focus:ring-1 focus:ring-indigo-400" /></div>
-            <div><label className="block text-xs font-medium mb-1">时长(秒)</label>
-              <input type="number" value={duration} onChange={e => setDuration(e.target.value)}
-                className="w-full px-2 py-1.5 text-sm border rounded focus:outline-none focus:ring-1 focus:ring-indigo-400" /></div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-ink-500 mb-1">期号</label>
+              <input type="number" value={epNum} onChange={e => setEpNum(e.target.value)} className="input" />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-ink-500 mb-1">日期</label>
+              <input type="date" value={publishDate} onChange={e => setPublishDate(e.target.value)} className="input" />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-ink-500 mb-1">时长(秒)</label>
+              <input type="number" value={duration} onChange={e => setDuration(e.target.value)} className="input" />
+            </div>
           </div>
-          <div><label className="block text-xs font-medium mb-1">标题</label>
-            <input type="text" value={title} onChange={e => setTitle(e.target.value)}
-              className="w-full px-2 py-1.5 text-sm border rounded focus:outline-none focus:ring-1 focus:ring-indigo-400" /></div>
-          <div><label className="block text-xs font-medium mb-1">简介</label>
-            <textarea value={description} onChange={e => setDescription(e.target.value)} rows={2}
-              className="w-full px-2 py-1.5 text-sm border rounded focus:outline-none focus:ring-1 focus:ring-indigo-400 resize-none" /></div>
-          <div><label className="block text-xs font-medium mb-1">文稿</label>
-            <textarea value={transcript} onChange={e => setTranscript(e.target.value)} rows={10}
-              className="w-full px-2 py-1.5 text-sm border rounded focus:outline-none focus:ring-1 focus:ring-indigo-400 font-mono resize-none" /></div>
-          {message && <div className={"text-xs p-2 rounded " + (message.includes("失败") ? "bg-red-50 text-red-600" : "bg-green-50 text-green-600")}>{message}</div>}
+          <div>
+            <label className="block text-xs font-medium text-ink-500 mb-1">标题</label>
+            <input type="text" value={title} onChange={e => setTitle(e.target.value)} className="input" />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-ink-500 mb-1">简介</label>
+            <textarea value={description} onChange={e => setDescription(e.target.value)} rows={2} className="input resize-none" />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-ink-500 mb-1">文稿</label>
+            <textarea value={transcript} onChange={e => setTranscript(e.target.value)} rows={10} className="input font-mono text-xs resize-none" />
+          </div>
+          {message && (
+            <div className={`text-xs p-2.5 rounded-lg ${message.includes("失败") ? "bg-red-50 text-red-600" : "bg-green-50 text-green-600"}`}>
+              {message}
+            </div>
+          )}
           <div className="flex gap-2">
-            <button onClick={handleSave} disabled={loading}
-              className="flex-1 py-2 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700 disabled:opacity-50">
+            <button onClick={handleSave} disabled={loading} className="btn btn-primary flex-1">
               {loading ? "保存中..." : "保存修改"}
             </button>
             {episode.status === "draft" && (
-              <button onClick={handleRequestReview} disabled={loading}
-                className="px-4 py-2 bg-yellow-100 text-yellow-700 text-sm rounded hover:bg-yellow-200 disabled:opacity-50">
+              <button onClick={handleRequestReview} disabled={loading} className="btn btn-warm">
                 📤 申请发布
               </button>
             )}

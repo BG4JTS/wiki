@@ -19,15 +19,15 @@ export default async function PitSection({ episodeId }: { episodeId: number }) {
   const statusEmoji: Record<string, string> = { open: "🕳", pending: "⏳", filled: "✅" };
 
   return (
-    <div className="mt-6">
-      <h2 className="text-lg font-semibold mb-3">🕳 相关坑</h2>
-      <div className="space-y-2">
+    <div>
+      <h2 className="section-title mb-3">🕳 相关坑</h2>
+      <div className="space-y-1.5">
         {pits.map(p => (
           <Link key={p.id} href={`/pits/${p.id}`}
-            className="block bg-white border rounded-lg px-3 py-2 text-sm hover:shadow-sm">
-            <span className="mr-2">{statusEmoji[p.status]}</span>
-            {p.title}
-            <span className="ml-2 text-xs text-gray-400">👍{p.up_votes} 👎{p.down_votes}</span>
+            className="card card-interactive px-3 py-2.5 text-sm flex items-center gap-2">
+            <span>{statusEmoji[p.status]}</span>
+            <span className="flex-1 truncate">{p.title}</span>
+            <span className="text-xs text-ink-300 shrink-0">👍{p.up_votes} 👎{p.down_votes}</span>
           </Link>
         ))}
       </div>

@@ -25,28 +25,33 @@ export default function ProfileEditor({ user, profile }: { user: User; profile: 
   };
 
   return (
-    <div className="bg-white border rounded-lg p-4 space-y-3">
+    <div className="card p-5 space-y-4">
       {avatarUrl && (
         <div className="flex justify-center">
-          <img src={avatarUrl} alt="头像" className="w-20 h-20 rounded-full object-cover border-2 border-indigo-200" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+          <img src={avatarUrl} alt="头像" className="w-20 h-20 rounded-full object-cover ring-2 ring-brand-100" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
         </div>
       )}
       <div>
-        <label className="block text-sm font-medium mb-1">头像 URL（图床链接）</label>
+        <label className="block text-sm font-medium text-ink-600 mb-1.5">头像 URL（图床链接）</label>
         <input type="url" value={avatarUrl} onChange={e => setAvatarUrl(e.target.value)}
-          placeholder="https://your-image-host.com/avatar.jpg"
-          className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+          placeholder="https://your-image-host.com/avatar.jpg" className="input" />
       </div>
-      <div><label className="block text-sm font-medium mb-1">邮箱</label>
-        <input type="text" value={user.email} disabled className="w-full px-3 py-2 bg-gray-100 border rounded-lg text-gray-500" /></div>
-      <div><label className="block text-sm font-medium mb-1">用户名</label>
+      <div>
+        <label className="block text-sm font-medium text-ink-600 mb-1.5">邮箱</label>
+        <input type="text" value={user.email} disabled className="input bg-ink-50 text-ink-400" />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-ink-600 mb-1.5">用户名</label>
         <input type="text" value={username} onChange={e => setUsername(e.target.value)}
-          placeholder="设置你的用户名" className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400" /></div>
-      <div><label className="block text-sm font-medium mb-1">简介</label>
+          placeholder="设置你的用户名" className="input" />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-ink-600 mb-1.5">简介</label>
         <textarea value={bio} onChange={e => setBio(e.target.value)} rows={3}
-          placeholder="介绍一下你自己..." className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 resize-none" /></div>
-      {message && <div className={"text-sm p-2 rounded "+(message.includes("成功")?"bg-green-50 text-green-600":"bg-red-50 text-red-600")}>{message}</div>}
-      <button onClick={handleSave} disabled={loading} className="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50">
+          placeholder="介绍一下你自己..." className="input resize-none" />
+      </div>
+      {message && <div className={`text-sm p-2.5 rounded-lg ${message.includes("成功")?"bg-green-50 text-green-600":"bg-red-50 text-red-600"}`}>{message}</div>}
+      <button onClick={handleSave} disabled={loading} className="btn btn-primary w-full">
         {loading?"保存中...":"保存"}
       </button>
     </div>

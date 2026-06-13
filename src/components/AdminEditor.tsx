@@ -78,130 +78,172 @@ export default function AdminEditor({ episodes, pits }: Props) {
     if(err) setMessage("添加失败："+err.message); else { setTlTimestamp(""); setTlTitle(""); setTlDescription(""); handleLoadTimelines(parseInt(timelineEpId)); }
     setLoading(false);
   };
-  const handleDeleteTimeline = async (id: number) => { const { error: err } = await (supabase.from("timelines").delete().eq("id",id)) as unknown as ErrResult; if(!err) handleLoadTimelines(parseInt(timelineEpId)); };
-
-  const handlePitStatus = async (id:number, s:string) => {
-    const { error: err } = await (supabase.from("pits").update({ status:s } as never).eq("id",id)) as unknown as ErrResult;
-    if(err) setMessage("失败："+err.message); else { setMessage("已更新"); router.refresh(); }
+  const handleDeleteTimeline = async (id: number) => {
+    const { error: err } = await (supabase.from("timelines").delete().eq("id",id)) as unknown as ErrResult;
+    if(!err) handleLoadTimelines(parseInt(timelineEpId));
   };
-  const handlePitVotes = async (id:number, up:number, down:number) => {
-    const { error: err } = await (supabase.from("pits").update({ up_votes:up, down_votes:down } as never).eq("id",id)) as unknown as ErrResult;
-    if(err) setMessage("失败："+err.message); else { setMessage("已更新"); router.refresh(); }
+  const handleUpdatePitStatus = async (pitId: number, status: string) => {
+    const { error: err } = await (supabase.from("pits").update({ status } as never).eq("id", pitId)) as unknown as ErrResult;
+    if(err) setMessage("更新失败："+err.message); else { setMessage("已更新！"); router.refresh(); }
   };
-  const handleDeletePit = async (id: number) => {
+  const handleDeletePit = async (pitId: number) => {
     if(!confirm("确定删除？")) return;
-    const { error: err } = await (supabase.from("pits").delete().eq("id",id)) as unknown as ErrResult;
-    if(err) setMessage("失败："+err.message); else { setMessage("已删除"); router.refresh(); }
+    const { error: err } = await (supabase.from("pits").delete().eq("id", pitId)) as unknown as ErrResult;
+    if(err) setMessage("删除失败："+err.message); else { setMessage("已删除！"); router.refresh(); }
   };
 
-  return (<div>
-    {message&&<div className="fixed top-4 right-4 z-50 bg-indigo-600 text-white text-sm px-4 py-2 rounded shadow-lg">{message}</div>}
-    <div className="flex gap-2 mb-4 flex-wrap">
-      {(["review","episode","timeline","pits"] as const).map(t=>(<button key={t} onClick={()=>setTab(t)} className={"px-4 py-2 text-sm rounded "+(tab===t?"bg-indigo-600 text-white":"bg-gray-100 hover:bg-gray-200")}>{t==="review"?"📋 审核":t==="episode"?"节目":t==="timeline"?"时间轴":"坑管理"}</button>))}
+  const tabBtn = (t: typeof tab, label: string) => (
+    <button onClick={() => setTab(t)}
+      className={`text-sm px-4 py-1.5 rounded-lg font-medium transition-all ${
+        tab===t ? "bg-brand-500 text-white shadow-sm" : "text-ink-500 hover:bg-ink-100"
+      }`}>{label}</button>
+  );
+
+  return (
+  <div>
+    <h1 className="text-2xl font-bold text-ink-800 mb-6">管理后台</h1>
+
+    <div className="flex gap-2 mb-6 flex-wrap">
+      {tabBtn("review", "审核")}
+      {tabBtn("episode", "节目")}
+      {tabBtn("timeline", "时间轴")}
+      {tabBtn("pits", "坑管理")}
     </div>
 
-    {tab==="review" ? (<>
-      <h2 className="text-lg font-semibold mb-2">待审核节目{pendingEps.length>0&&<span className="ml-2 text-sm text-red-500">({pendingEps.length})</span>}</h2>
-      {pendingEps.length===0?<p className="text-sm text-gray-400 py-8 text-center">暂无待审核节目</p>:(
-        <div className="bg-white border rounded-lg divide-y">
-          {pendingEps.map(ep=>(
-            <div key={ep.id} className="flex items-center justify-between px-4 py-3">
-              <span className="text-sm"><span className="text-indigo-600 font-mono">{"#"+ep.episode_number}</span>{" "+ep.title}</span>
-              <div className="flex gap-2">
-                <a href={"/episodes/"+ep.id} target="_blank" className="text-xs text-gray-400 hover:text-indigo-500 underline">查看</a>
-                <button onClick={()=>handlePublishEpisode(ep.id)} className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200">✅ 通过</button>
-                <button onClick={()=>handleRejectEpisode(ep.id)} className="text-xs px-2 py-1 bg-red-50 text-red-500 rounded hover:bg-red-100">↩ 驳回</button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+    {message && <div className={`p-2.5 rounded-lg text-sm mb-4 ${message.includes("成功")||message.includes("已")?"bg-green-50 text-green-600 border border-green-100":"bg-red-50 text-red-600 border border-red-100"}`}>{message}</div>}
 
-      {draftEps.length>0&&(<>
-        <h2 className="text-lg font-semibold mt-6 mb-2">草稿节目</h2>
-        <div className="bg-white border rounded-lg divide-y">
-          {draftEps.map(ep=>(
-            <div key={ep.id} className="flex items-center justify-between px-4 py-2.5">
-              <span className="text-sm"><span className="text-indigo-600 font-mono">{"#"+ep.episode_number}</span>{" "+ep.title}</span>
-              <div className="flex gap-2">
-                <button onClick={()=>handleLoadEpisode(ep.id)} className="text-xs text-indigo-600 hover:underline">编辑</button>
-                <button onClick={()=>handlePublishEpisode(ep.id)} className="text-xs text-green-600 hover:underline">发布</button>
-                <button onClick={()=>handleDeleteEpisode(ep.id)} className="text-xs text-red-500 hover:underline">删除</button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </>)}
-    </>) : tab==="pits" ? (<>
-      <div className="flex gap-2 mb-2">
-        {["","open","pending","filled"].map(s=>(<button key={s} onClick={()=>setPitFilter(s)} className={"text-xs px-2 py-1 rounded "+(pitFilter===s?"bg-indigo-600 text-white":"bg-gray-100 hover:bg-gray-200")}>{s||"全部"}</button>))}
-      </div>
-      <div className="bg-white border rounded-lg divide-y max-h-96 overflow-y-auto">
-        {fp.length===0?<p className="p-4 text-sm text-gray-400">暂无</p>:fp.map(p=>(
-          <div key={p.id} className="flex items-center justify-between px-4 py-2.5">
-            <span className="text-sm">{p.title}</span>
-            <div className="flex items-center gap-2">
-              <span className={"text-xs px-2 py-0.5 rounded "+(p.status==="pending"?"bg-yellow-100":p.status==="filled"?"bg-green-100":"bg-gray-100")}>
-                {p.status==="open"?"开放":p.status==="pending"?"待填":"已填"}
-              </span>
-              <span className="text-xs text-gray-400">{"👍"+p.up_votes+" 👎"+p.down_votes}</span>
-              <select defaultValue="" onChange={e=>{if(e.target.value)handlePitStatus(p.id,e.target.value)}} className="text-xs border rounded px-1">
-                <option value="">状态</option><option value="open">开放</option><option value="pending">待填</option><option value="filled">已填</option>
-              </select>
-              <button onClick={()=>{const u=prompt("顶",String(p.up_votes));const d=prompt("踩",String(p.down_votes));if(u&&d)handlePitVotes(p.id,parseInt(u),parseInt(d))}} className="text-xs text-indigo-500 hover:underline">票数</button>
-              <button onClick={()=>handleDeletePit(p.id)} className="text-xs text-red-500 hover:underline">删除</button>
-            </div>
+    {tab==="review" && <>
+      <h2 className="section-title mb-3">待审核 ({pendingEps.length})</h2>
+      {pendingEps.length===0?<p className="text-sm text-ink-400 mb-6">没有待审核节目</p>:pendingEps.map(ep=>(
+        <div key={ep.id} className="card p-3 mb-2 flex items-center justify-between">
+          <div>
+            <span className="font-mono text-sm text-brand-500 mr-2">#{ep.episode_number}</span>
+            <span className="text-sm font-medium">{ep.title}</span>
           </div>
+          <div className="flex gap-2">
+            <button onClick={()=>handlePublishEpisode(ep.id)} className="btn btn-primary text-xs">通过</button>
+            <button onClick={()=>handleRejectEpisode(ep.id)} className="btn btn-ghost text-xs">驳回</button>
+          </div>
+        </div>
+      ))}
+
+      <h2 className="section-title mb-3 mt-8">草稿 ({draftEps.length})</h2>
+      {draftEps.length===0?<p className="text-sm text-ink-400 mb-6">没有草稿</p>:draftEps.map(ep=>(
+        <div key={ep.id} className="card p-3 mb-2 flex items-center justify-between">
+          <div>
+            <span className="font-mono text-sm text-brand-500 mr-2">#{ep.episode_number}</span>
+            <span className="text-sm">{ep.title}</span>
+          </div>
+          <button onClick={()=>handleLoadEpisode(ep.id)} className="btn btn-ghost text-xs">编辑</button>
+        </div>
+      ))}
+
+      <h2 className="section-title mb-3 mt-8">已发布 ({publishedEps.length})</h2>
+      {publishedEps.length===0?<p className="text-sm text-ink-400">没有已发布节目</p>:publishedEps.map(ep=>(
+        <div key={ep.id} className="card p-3 mb-2 flex items-center justify-between">
+          <div>
+            <span className="font-mono text-sm text-brand-500 mr-2">#{ep.episode_number}</span>
+            <span className="text-sm">{ep.title}</span>
+          </div>
+          <button onClick={()=>handleLoadEpisode(ep.id)} className="btn btn-ghost text-xs">编辑</button>
+        </div>
+      ))}
+    </>}
+
+    {(tab==="pits") && <>
+      <h2 className="section-title mb-3">坑管理</h2>
+      <div className="flex gap-2 mb-4">
+        {["","open","pending","filled"].map(s=>(
+          <button key={s} onClick={()=>setPitFilter(s)}
+            className={`text-xs px-3 py-1 rounded-full transition-all ${s===pitFilter?"bg-brand-500 text-white":"bg-white border border-ink-100 text-ink-500 hover:border-brand-200"}`}>
+            {s||"全部"}
+          </button>
         ))}
       </div>
-    </>) : tab==="episode" ? (<>
-      <div className="mb-6">
-        <h2 className="text-lg font-semibold mb-2">节目列表</h2>
-        <div className="bg-white border rounded-lg divide-y max-h-80 overflow-y-auto">
-          {publishedEps.length===0?<p className="p-4 text-sm text-gray-400">暂无</p>:publishedEps.map(ep=>(
-            <div key={ep.id} className="flex items-center justify-between px-4 py-2.5">
-              <span className="text-sm"><span className="text-indigo-600 font-mono">{"#"+ep.episode_number}</span>{" "+ep.title}</span>
+      {fp.length===0?<p className="text-sm text-ink-400">无匹配项</p>:fp.map(p=>(
+        <div key={p.id} className="card p-3 mb-2 flex items-center justify-between flex-wrap gap-2">
+          <div>
+            <span className={`badge text-xs ${p.status==="open"?"badge-brand":p.status==="pending"?"badge-pending":"badge-published"}`}>{p.status}</span>
+            <span className="ml-2 text-sm">{p.title}</span>
+            <span className="ml-2 text-xs text-ink-400">👍{p.up_votes} 👎{p.down_votes}</span>
+          </div>
+          <div className="flex gap-1">
+            <select value={p.status} onChange={(e)=>handleUpdatePitStatus(p.id, e.target.value)}
+              className="text-xs border border-ink-200 rounded px-2 py-1 bg-white text-ink-500">
+              <option value="open">开放</option>
+              <option value="pending">待填</option>
+              <option value="filled">已填</option>
+            </select>
+            <button onClick={()=>handleDeletePit(p.id)} className="btn btn-ghost text-xs text-red-400">删除</button>
+          </div>
+        </div>
+      ))}
+    </>}
+
+    {tab==="episode" && <>
+      <div className="space-y-3 mb-6">
+        <h2 className="section-title">选择节目编辑</h2>
+        <div className="card p-3 space-y-1 max-h-64 overflow-y-auto">
+          {episodes.map(ep=>(
+            <div key={ep.id} className="flex items-center justify-between py-1">
+              <span onClick={()=>handleLoadEpisode(ep.id)} className="cursor-pointer hover:text-brand-500 text-sm">
+                <span className="font-mono text-brand-500">#{ep.episode_number}</span>{" "+ep.title}
+              </span>
               <div className="flex gap-2">
-                <button onClick={()=>handleLoadEpisode(ep.id)} className="text-xs text-indigo-600 hover:underline">编辑</button>
-                <button onClick={()=>handleLoadTimelines(ep.id)} className="text-xs text-indigo-600 hover:underline">时间轴</button>
-                <button onClick={()=>handleDeleteEpisode(ep.id)} className="text-xs text-red-500 hover:underline">删除</button>
+                <button onClick={()=>handleLoadEpisode(ep.id)} className="btn btn-ghost text-xs">编辑</button>
+                <button onClick={()=>handleLoadTimelines(ep.id)} className="btn btn-ghost text-xs">时间轴</button>
+                <button onClick={()=>handleDeleteEpisode(ep.id)} className="btn btn-ghost text-xs text-red-400">删除</button>
               </div>
             </div>
           ))}
         </div>
       </div>
-      <div className="bg-white border rounded-lg p-4 space-y-3">
+      <div className="card p-5 space-y-4">
         <div className="grid grid-cols-3 gap-3">
-          <div><label className="block text-xs font-medium mb-1">期号</label><input type="number" value={epNum} onChange={e=>setEpNum(e.target.value)} className="w-full px-2 py-1.5 text-sm border rounded focus:outline-none focus:ring-1 focus:ring-indigo-400"/></div>
-          <div><label className="block text-xs font-medium mb-1">日期</label><input type="date" value={publishDate} onChange={e=>setPublishDate(e.target.value)} className="w-full px-2 py-1.5 text-sm border rounded focus:outline-none focus:ring-1 focus:ring-indigo-400"/></div>
-          <div><label className="block text-xs font-medium mb-1">时长(秒)</label><input type="number" value={duration} onChange={e=>setDuration(e.target.value)} className="w-full px-2 py-1.5 text-sm border rounded focus:outline-none focus:ring-1 focus:ring-indigo-400"/></div>
+          <div><label className="block text-xs font-medium text-ink-500 mb-1">期号</label><input type="number" value={epNum} onChange={e=>setEpNum(e.target.value)} className="input" /></div>
+          <div><label className="block text-xs font-medium text-ink-500 mb-1">日期</label><input type="date" value={publishDate} onChange={e=>setPublishDate(e.target.value)} className="input" /></div>
+          <div><label className="block text-xs font-medium text-ink-500 mb-1">时长(秒)</label><input type="number" value={duration} onChange={e=>setDuration(e.target.value)} className="input" /></div>
         </div>
-        <div><label className="block text-xs font-medium mb-1">标题</label><input type="text" value={title} onChange={e=>setTitle(e.target.value)} className="w-full px-2 py-1.5 text-sm border rounded focus:outline-none focus:ring-1 focus:ring-indigo-400"/></div>
-        <div><label className="block text-xs font-medium mb-1">简介</label><textarea value={description} onChange={e=>setDescription(e.target.value)} rows={2} className="w-full px-2 py-1.5 text-sm border rounded focus:outline-none focus:ring-1 focus:ring-indigo-400 resize-none"/></div>
-        <div><label className="block text-xs font-medium mb-1">文稿</label><textarea value={transcript} onChange={e=>setTranscript(e.target.value)} rows={15} className="w-full px-2 py-1.5 text-sm border rounded focus:outline-none focus:ring-1 focus:ring-indigo-400 font-mono"/></div>
-        <div className="flex gap-2"><button onClick={handleSaveEpisode} disabled={loading} className="px-4 py-2 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700 disabled:opacity-50">{editId?"更新":"创建"}</button>{editId&&<button onClick={handleReset} className="px-4 py-2 bg-gray-100 text-sm rounded hover:bg-gray-200">新建</button>}</div>
+        <div><label className="block text-xs font-medium text-ink-500 mb-1">标题</label><input type="text" value={title} onChange={e=>setTitle(e.target.value)} className="input" /></div>
+        <div><label className="block text-xs font-medium text-ink-500 mb-1">简介</label><textarea value={description} onChange={e=>setDescription(e.target.value)} rows={2} className="input resize-none" /></div>
+        <div><label className="block text-xs font-medium text-ink-500 mb-1">文稿</label><textarea value={transcript} onChange={e=>setTranscript(e.target.value)} rows={15} className="input font-mono resize-none" /></div>
+        <div className="flex gap-2">
+          <button onClick={handleSaveEpisode} disabled={loading} className="btn btn-primary">{editId?"更新":"创建"}</button>
+          {editId&&<button onClick={handleReset} className="btn btn-outline">新建</button>}
+        </div>
       </div>
-    </>) : (<>
+    </>}
+
+    {tab==="timeline" && <>
       <div className="space-y-3">
-        <div><label className="block text-xs font-medium mb-1">关联节目</label>
-          <select value={timelineEpId} onChange={e=>handleLoadTimelines(parseInt(e.target.value))} className="w-full px-2 py-1.5 text-sm border rounded focus:outline-none focus:ring-1 focus:ring-indigo-400">
+        <div>
+          <label className="block text-sm font-medium text-ink-600 mb-1.5">关联节目</label>
+          <select value={timelineEpId} onChange={e=>handleLoadTimelines(parseInt(e.target.value))} className="input">
             <option value="">选择...</option>
             {episodes.map(ep=><option key={ep.id} value={ep.id}>{"#"+ep.episode_number+" "+ep.title}</option>)}
           </select>
         </div>
         {timelineEpId && (<div>
-          <h3 className="text-sm font-medium mb-2">时间轴</h3>
-          <div className="space-y-2 mb-3 max-h-60 overflow-y-auto">
-            {tlList.length===0?<p className="text-sm text-gray-400">暂无</p>:tlList.map(tl=>(<div key={tl.id} className="flex items-center justify-between bg-gray-50 p-2 rounded text-sm"><div><span className="font-mono text-indigo-500 text-xs">{formatTime(tl.timestamp_sec)}</span><span className="ml-2">{tl.title}</span></div><button onClick={()=>handleDeleteTimeline(tl.id)} className="text-xs text-red-500 hover:underline">删除</button></div>))}
+          <h3 className="text-sm font-medium text-ink-600 mb-3">时间轴</h3>
+          <div className="space-y-2 mb-4 max-h-60 overflow-y-auto">
+            {tlList.length===0?<p className="text-sm text-ink-400">暂无</p>:tlList.map(tl=>(
+              <div key={tl.id} className="card px-3 py-2 flex items-center justify-between text-sm">
+                <div><span className="font-mono text-brand-500 text-xs bg-brand-50 px-1.5 py-0.5 rounded">{formatTime(tl.timestamp_sec)}</span><span className="ml-2 text-ink-700">{tl.title}</span></div>
+                <button onClick={()=>handleDeleteTimeline(tl.id)} className="btn btn-ghost text-xs text-red-400">删除</button>
+              </div>
+            ))}
           </div>
-          <div className="border-t pt-3 space-y-2">
-            <div className="flex gap-2"><input type="number" value={tlTimestamp} onChange={e=>setTlTimestamp(e.target.value)} placeholder="秒" className="w-24 px-2 py-1.5 text-sm border rounded"/><input type="text" value={tlTitle} onChange={e=>setTlTitle(e.target.value)} placeholder="标题" className="flex-1 px-2 py-1.5 text-sm border rounded"/></div>
-            <input type="text" value={tlDescription} onChange={e=>setTlDescription(e.target.value)} placeholder="说明" className="w-full px-2 py-1.5 text-sm border rounded"/>
-            <button onClick={handleAddTimeline} disabled={loading} className="px-4 py-2 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700">添加</button>
+          <div className="border-t border-ink-100 pt-4 space-y-2">
+            <div className="flex gap-2">
+              <input type="number" value={tlTimestamp} onChange={e=>setTlTimestamp(e.target.value)} placeholder="秒" className="input w-24" />
+              <input type="text" value={tlTitle} onChange={e=>setTlTitle(e.target.value)} placeholder="标题" className="input flex-1" />
+            </div>
+            <input type="text" value={tlDescription} onChange={e=>setTlDescription(e.target.value)} placeholder="说明" className="input" />
+            <button onClick={handleAddTimeline} disabled={loading} className="btn btn-primary text-sm">添加</button>
           </div>
         </div>)}
       </div>
-    </>)}
+    </>}
   </div>);
 }
 

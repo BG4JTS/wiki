@@ -39,24 +39,24 @@ export default async function ProfilePage() {
   const comments = (commentResult.data ?? []) as CommentItem[];
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-6">个人中心</h1>
+    <div className="animate-fade-in-up max-w-4xl mx-auto">
+      <h1 className="text-2xl font-bold text-ink-800 mb-8">个人中心</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div>
-          <h2 className="text-lg font-semibold mb-3">个人资料</h2>
+          <h2 className="section-title mb-4">个人资料</h2>
           <ProfileEditor user={user} profile={profile} />
         </div>
 
         <div>
-          <h2 className="text-lg font-semibold mb-3">我的评论</h2>
+          <h2 className="section-title mb-4">我的评论</h2>
           {comments.length === 0 ? (
-            <p className="text-sm text-gray-400">暂无评论</p>
+            <p className="text-sm text-ink-400">暂无评论</p>
           ) : (
             <div className="space-y-2">
               {comments.map((c) => (
-                <div key={c.id} className="bg-white border rounded-lg p-3 text-sm">
-                  <p className="text-xs text-gray-500 mb-1">
+                <div key={c.id} className="card p-3 text-sm">
+                  <p className="text-xs text-ink-400 mb-1">
                     {new Date(c.created_at).toLocaleString("zh-CN")}
                   </p>
                   <p>{c.content}</p>

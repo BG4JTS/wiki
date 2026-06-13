@@ -4,11 +4,7 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { UserContribution, User } from "@/types/database";
 
-export default function UserContributions({
-  episodeId,
-}: {
-  episodeId: number;
-}) {
+export default function UserContributions({ episodeId }: { episodeId: number }) {
   const [contributions, setContributions] = useState<UserContribution[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [contentType, setContentType] = useState<"link" | "note" | "image_url">("link");
@@ -34,8 +30,7 @@ export default function UserContributions({
     const data = result.data; const error = result.error;
 
     if (error) setError(error.message);
-    else     // 批量获取用户资料
-    if (data && data.length > 0) {
+    else if (data && data.length > 0) {
       const userIds = [...new Set(data.map((c) => c.user_id))];
       const pResult = await supabase
         .from("user_profiles")
@@ -53,21 +48,11 @@ export default function UserContributions({
   const handleSubmit = async () => {
     if (!content.trim() || !user) return;
     const { error } = await supabase.from("user_contributions").insert({
-      episode_id: episodeId,
-      user_id: user.id,
-      content_type: contentType,
-      content: content.trim(),
-      description: description.trim(),
+      episode_id: episodeId, user_id: user.id, content_type: contentType,
+      content: content.trim(), description: description.trim(),
     } as never);
-
-    if (error) {
-      setError(error.message);
-    } else {
-      setContent("");
-      setDescription("");
-      setShowForm(false);
-      loadContributions();
-    }
+    if (error) { setError(error.message); }
+    else { setContent(""); setDescription(""); setShowForm(false); loadContributions(); }
   };
 
   const handleVote = async (id: number) => {
@@ -76,122 +61,68 @@ export default function UserContributions({
   };
 
   const typeLabels: Record<string, string> = {
-    link: "🔗 链接",
-    note: "📝 笔记",
-    image_url: "🖼 图片",
+    link: "🔗 链接", note: "📝 笔记", image_url: "🖼 图片",
   };
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="text-lg font-semibold">📌 用户补充</h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="section-title">📌 用户补充</h2>
         {user && (
-          <button
-            onClick={() => setShowForm(!showForm)}
-            className="text-sm text-indigo-600 hover:text-indigo-800"
-          >
+          <button onClick={() => setShowForm(!showForm)} className="btn btn-ghost text-xs">
             + 添加
           </button>
         )}
       </div>
 
-      {error && (
-        <div className="bg-red-50 text-red-600 p-2 rounded text-sm mb-3">
-          {error}
-        </div>
-      )}
+      {error && <div className="bg-red-50 text-red-600 p-2 rounded-lg text-sm mb-3">{error}</div>}
 
       {showForm && (
-        <div className="bg-white border rounded-lg p-3 mb-3 space-y-2">
-          <div className="flex gap-2">
+        <div className="card p-4 mb-3 space-y-2">
+          <div className="flex gap-1.5">
             {(["link", "note", "image_url"] as const).map((t) => (
-              <button
-                key={t}
-                onClick={() => setContentType(t)}
-                className={`px-2 py-1 text-xs rounded ${
-                  contentType === t
-                    ? "bg-indigo-600 text-white"
-                    : "bg-gray-100 hover:bg-gray-200"
-                }`}
-              >
+              <button key={t} onClick={() => setContentType(t)}
+                className={`text-xs px-2.5 py-1 rounded-full font-medium transition-all ${
+                  contentType === t ? "bg-brand-500 text-white" : "bg-ink-100 text-ink-500 hover:bg-ink-200"
+                }`}>
                 {typeLabels[t]}
               </button>
             ))}
           </div>
-          <input
-            type="text"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder={
-              contentType === "link"
-                ? "输入链接 URL"
-                : contentType === "image_url"
-                ? "输入图片 URL"
-                : "输入笔记内容"
-            }
-            className="w-full px-2 py-1 text-sm border rounded focus:outline-none focus:ring-1 focus:ring-indigo-400"
-          />
-          <input
-            type="text"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="简短说明（可选）"
-            maxLength={500}
-            className="w-full px-2 py-1 text-sm border rounded focus:outline-none focus:ring-1 focus:ring-indigo-400"
-          />
-          <button
-            onClick={handleSubmit}
-            className="w-full py-1.5 text-sm bg-indigo-600 text-white rounded hover:bg-indigo-700"
-          >
-            提交
-          </button>
+          <input type="text" value={content} onChange={(e) => setContent(e.target.value)}
+            placeholder={contentType === "link" ? "输入链接 URL" : contentType === "image_url" ? "输入图片 URL" : "输入笔记内容"}
+            className="input" />
+          <input type="text" value={description} onChange={(e) => setDescription(e.target.value)}
+            placeholder="简短说明（可选）" maxLength={500} className="input" />
+          <button onClick={handleSubmit} className="btn btn-primary w-full text-sm">提交</button>
         </div>
       )}
 
       {loading ? (
-        <p className="text-sm text-gray-400">加载中...</p>
+        <div className="space-y-2">
+          {[1,2].map(i=><div key={i} className="skeleton h-14 w-full rounded-lg" />)}
+        </div>
       ) : contributions.length === 0 ? (
-        <p className="text-sm text-gray-400">暂无补充内容</p>
+        <p className="text-sm text-ink-400">暂无补充内容</p>
       ) : (
         <div className="space-y-2">
           {contributions.map((c) => (
-            <div
-              key={c.id}
-              className="bg-white border rounded-lg p-3 text-sm"
-            >
-              <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
-                <span>{typeLabels[c.content_type]}</span>
-                <span className="font-medium text-gray-700">
+            <div key={c.id} className="card p-3 text-sm">
+              <div className="flex items-center gap-2 text-xs text-ink-400 mb-1">
+                <span className="badge-brand text-xs px-2 py-0.5">{typeLabels[c.content_type]}</span>
+                <span className="font-medium text-ink-600">
                   {c.user_profile ? (<><img src={c.user_profile.avatar_url || ""} alt="" className="w-4 h-4 rounded-full inline-block mr-1 object-cover" onError={e=>{(e.target as HTMLImageElement).style.display="none"}} />{c.user_profile.username}</>) : "匿名"}
                 </span>
               </div>
               {c.content_type === "image_url" ? (
-                <img
-                  src={c.content}
-                  alt={c.description || "补充图片"}
-                  className="rounded max-h-40 object-cover my-1"
-                />
+                <img src={c.content} alt={c.description || "补充图片"} className="rounded-lg max-h-40 object-cover my-1" />
               ) : c.content_type === "link" ? (
-                <a
-                  href={c.content}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-indigo-600 hover:underline break-all"
-                >
-                  {c.description || c.content}
-                </a>
+                <a href={c.content} target="_blank" rel="noopener noreferrer" className="text-brand-500 hover:underline break-all text-sm">{c.description || c.content}</a>
               ) : (
-                <p>{c.content}</p>
+                <p className="text-ink-700">{c.content}</p>
               )}
-              {c.content_type !== "note" && c.description && (
-                <p className="text-gray-500 mt-0.5">{c.description}</p>
-              )}
-              <button
-                onClick={() => handleVote(c.id)}
-                className="text-xs text-gray-400 hover:text-indigo-600 mt-1"
-              >
-                👍 {c.votes}
-              </button>
+              {c.content_type !== "note" && c.description && <p className="text-ink-400 mt-0.5">{c.description}</p>}
+              <button onClick={() => handleVote(c.id)} className="text-xs text-ink-400 hover:text-brand-500 mt-1 font-medium">👍 {c.votes}</button>
             </div>
           ))}
         </div>

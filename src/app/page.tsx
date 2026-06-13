@@ -26,7 +26,7 @@ export default async function HomePage({
 
   const supabase = await createClient();
   let episodes: EpisodeItem[] = [];
-  let totalPages = 0;
+  let totalCount = 0;
   try {
     let epResult;
     try {
@@ -43,96 +43,135 @@ export default async function HomePage({
         .range(from, to);
     }
     const allData = (epResult.data ?? []) as EpisodeItem[];
-    // JS 层按标签过滤
     if (currentTab === "published") {
       episodes = allData.filter(ep => !ep.status || ep.status === "published");
     } else {
       episodes = allData.filter(ep => ep.status && ep.status !== "published");
     }
-    totalPages = Math.ceil((epResult.count || 0) / PAGE_SIZE);
+    totalCount = epResult.count || 0;
   } catch { /* query failed, show empty */ }
 
-  const tabs = [
-    { key: "published", label: "已发布" },
-    { key: "drafts", label: "草稿" },
-  ];
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
-  const statusLabel: Record<string, string> = {
-    draft: "📝 草稿",
-    pending: "⏳ 待审核",
+  const statusBadge = (s?: string) => {
+    if (!s || s === "published") return null;
+    if (s === "pending") return <span className="badge badge-pending">⏳ 待审核</span>;
+    return <span className="badge badge-draft">📝 草稿</span>;
   };
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-bold">节目列表</h1>
-        <Link href="/episodes/new" className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700">+ 提节目</Link>
-      </div>
-
-      <div className="flex gap-1 mb-4">
-        {tabs.map(t => (
-          <Link
-            key={t.key}
-            href={`/?tab=${t.key}`}
-            className={`text-xs px-3 py-1 rounded-full ${currentTab === t.key ? "bg-indigo-600 text-white" : "bg-gray-100 hover:bg-gray-200"}`}
-          >
-            {t.label}
+    <div className="animate-fade-in-up">
+      {/* Hero */}
+      <div className="mb-8 sm:mb-10">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl sm:text-4xl font-bold text-ink-800 tracking-tight">
+              原样WIKI
+            </h1>
+            <p className="text-ink-400 text-sm mt-2 max-w-md">
+              播客文字稿知识库 — 大家一起补充、讨论、挖坑填坑
+            </p>
+          </div>
+          <Link href="/episodes/new" className="btn btn-primary self-start sm:self-auto">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            提节目
           </Link>
-        ))}
+        </div>
       </div>
 
+      {/* Tabs */}
+      <div className="flex items-center gap-3 mb-6 border-b border-ink-100 pb-3">
+        <Link
+          href="/?tab=published"
+          className={`text-sm font-medium pb-1.5 border-b-2 transition-colors ${
+            currentTab === "published"
+              ? "border-brand-500 text-brand-600"
+              : "border-transparent text-ink-400 hover:text-ink-600"
+          }`}
+        >
+          已发布
+        </Link>
+        <Link
+          href="/?tab=drafts"
+          className={`text-sm font-medium pb-1.5 border-b-2 transition-colors ${
+            currentTab === "drafts"
+              ? "border-brand-500 text-brand-600"
+              : "border-transparent text-ink-400 hover:text-ink-600"
+          }`}
+        >
+          草稿
+        </Link>
+      </div>
+
+      {/* Empty State */}
       {episodes.length === 0 ? (
-        <div className="text-center py-20 text-gray-400">
-          <p className="text-lg mb-2">{currentTab === "drafts" ? "暂无草稿" : "暂无节目"}</p>
-          <p className="text-sm">
-            {currentTab === "published" ? (
-              <>还没有已发布的节目，<Link href="/episodes/new" className="text-indigo-500 hover:underline">来提第一个</Link></>
-            ) : (
-              <>还没有草稿节目，<Link href="/episodes/new" className="text-indigo-500 hover:underline">来提一个</Link></>
-            )}
+        <div className="text-center py-20">
+          <div className="text-5xl mb-4">{currentTab === "drafts" ? "📝" : "📚"}</div>
+          <p className="text-lg font-medium text-ink-500 mb-1">
+            {currentTab === "drafts" ? "暂无草稿" : "暂无节目"}
           </p>
+          <p className="text-sm text-ink-400 mb-6">
+            {currentTab === "published"
+              ? "还没有已发布的节目，来提第一个吧"
+              : "还没有草稿节目"}
+          </p>
+          <Link href="/episodes/new" className="btn btn-primary text-sm">
+            来提第一个
+          </Link>
         </div>
       ) : (
-        <div className="space-y-4">
-          {episodes.map((ep) => (
+        /* Episode Cards */
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {episodes.map((ep, i) => (
             <Link
               key={ep.id}
               href={`/episodes/${ep.id}`}
-              className="block bg-white rounded-lg shadow-sm border p-5 hover:shadow-md transition-shadow"
+              className={`card card-interactive p-5 flex flex-col animate-fade-in-up stagger-${Math.min(i + 1, 5)}`}
             >
-              <div className="flex items-baseline gap-3 mb-2">
-                <span className="text-indigo-600 font-mono text-sm">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-xs font-mono text-brand-500 font-medium">
                   #{ep.episode_number}
                 </span>
-                <h2 className="text-lg font-semibold">{ep.title}</h2>
-                {ep.status && ep.status !== "published" && (
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${ep.status === "pending" ? "bg-yellow-100 text-yellow-700" : "bg-gray-100 text-gray-500"}`}>
-                    {statusLabel[ep.status] || ep.status}
-                  </span>
-                )}
+                {statusBadge(ep.status)}
               </div>
-              <p className="text-sm text-gray-500 line-clamp-2">
-                {ep.description}
+              <h2 className="font-semibold text-ink-800 mb-1.5 line-clamp-2 leading-snug">
+                {ep.title}
+              </h2>
+              <p className="text-xs text-ink-400 line-clamp-2 mb-3 flex-1">
+                {ep.description || "暂无简介"}
               </p>
-              <div className="flex gap-4 mt-3 text-xs text-gray-400">
-                <span>{ep.publish_date}</span>
-                <span>{Math.floor(ep.duration / 60)} 分钟</span>
+              <div className="flex items-center gap-3 text-xs text-ink-300 pt-3 border-t border-ink-50">
+                <span className="flex items-center gap-1">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  {ep.publish_date}
+                </span>
+                <span className="flex items-center gap-1">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {Math.floor(ep.duration / 60)} 分钟
+                </span>
               </div>
             </Link>
           ))}
         </div>
       )}
 
+      {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex justify-center gap-2 mt-8">
+        <div className="flex justify-center gap-1.5 mt-10">
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
             <Link
               key={n}
               href={`/?tab=${currentTab}&page=${n}`}
-              className={`px-3 py-1 rounded text-sm ${
+              className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-medium transition-all ${
                 n === currentPage
-                  ? "bg-indigo-600 text-white"
-                  : "bg-white border hover:bg-gray-50"
+                  ? "bg-brand-500 text-white shadow-sm"
+                  : "bg-white text-ink-500 border border-ink-100 hover:border-brand-200 hover:text-brand-600"
               }`}
             >
               {n}

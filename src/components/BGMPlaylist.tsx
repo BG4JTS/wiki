@@ -28,7 +28,11 @@ export default function BGMPlaylist({ episodeId }: { episodeId: number }) {
       .eq("episode_id", episodeId)
       .order("timestamp_sec") as { data: BgmSong[] | null; error: unknown };
     setSongs(data ?? []);
-    const uids=[...new Set((data??[]).map((s:BgmSong)=>s.user_id||"").filter(Boolean))];if(uids.length){const pr=await supabase.from("user_profiles").select("id,username,avatar_url").in("id",uids)as{data:{id:string;username:string;avatar_url:string}[]|null;error:unknown};if(pr.data)setProfiles(new Map(pr.data.map(p=>[p.id,p])));}
+    const uids=[...new Set((data??[]).map((s:BgmSong)=>s.user_id||"").filter(Boolean))];
+    if(uids.length){
+      const pr=await supabase.from("user_profiles").select("id,username,avatar_url").in("id",uids)as{data:{id:string;username:string;avatar_url:string}[]|null;error:unknown};
+      if(pr.data)setProfiles(new Map(pr.data.map(p=>[p.id,p])));
+    }
     setLoading(false);
   };
 
@@ -51,53 +55,53 @@ export default function BGMPlaylist({ episodeId }: { episodeId: number }) {
     loadSongs();
   };
 
-  if (loading) return <p className="text-sm text-gray-400">加载中...</p>;
+  if (loading) return <div className="space-y-2">{[1,2,3].map(i=><div key={i} className="skeleton h-10 w-full rounded-lg" />)}</div>;
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="text-lg font-semibold">🎵 BGM 歌单</h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="section-title">🎵 BGM 歌单</h2>
         {user && (
-          <button onClick={() => setShowForm(!showForm)} className="text-xs text-indigo-600 hover:underline">
+          <button onClick={() => setShowForm(!showForm)} className="btn btn-ghost text-xs">
             {showForm ? "取消" : "+ 添加"}
           </button>
         )}
       </div>
 
       {showForm && (
-        <div className="bg-white border rounded-lg p-3 mb-3 space-y-2">
+        <div className="card p-4 mb-4 space-y-2">
           <div className="flex gap-2">
             <input type="number" value={tsSec} onChange={e => setTsSec(e.target.value)}
-              placeholder="秒" className="w-24 px-2 py-1.5 text-sm border rounded focus:outline-none focus:ring-1 focus:ring-indigo-400" />
+              placeholder="秒" className="input w-24" />
             <input type="text" value={title} onChange={e => setTitle(e.target.value)}
-              placeholder="曲名 *" className="flex-1 px-2 py-1.5 text-sm border rounded focus:outline-none focus:ring-1 focus:ring-indigo-400" />
+              placeholder="曲名 *" className="input flex-1" />
           </div>
           <input type="text" value={artist} onChange={e => setArtist(e.target.value)}
-            placeholder="艺术家（选填）" className="w-full px-2 py-1.5 text-sm border rounded focus:outline-none focus:ring-1 focus:ring-indigo-400" />
+            placeholder="艺术家（选填）" className="input" />
           {message && <p className="text-xs text-red-500">{message}</p>}
-          <button onClick={handleAdd} className="w-full py-2 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700">添加</button>
+          <button onClick={handleAdd} className="btn btn-primary w-full text-sm">添加</button>
         </div>
       )}
 
       {songs.length === 0 ? (
-        <p className="text-sm text-gray-400">{user ? "还没有歌曲，来添加第一首" : "暂无歌单"}</p>
+        <p className="text-sm text-ink-400">{user ? "还没有歌曲，来添加第一首" : "暂无歌单"}</p>
       ) : (
-        <div className="bg-white rounded-lg border divide-y">
+        <div className="card divide-y divide-ink-50">
           {songs.map((song) => (
-            <div key={song.id} className="flex items-center justify-between px-3 py-2.5 group">
+            <div key={song.id} className="flex items-center justify-between px-4 py-3 group">
               <div className="flex items-center gap-3 min-w-0">
-                <span className="text-xs font-mono text-indigo-500 shrink-0">
+                <span className="text-xs font-mono text-brand-500 shrink-0 bg-brand-50 px-1.5 py-0.5 rounded">
                   {formatTime(song.timestamp_sec)}
                 </span>
                 <div className="min-w-0">
-                  <span className="text-sm font-medium">🎶 {song.title}</span>
-                  {song.artist && (<span className="text-xs text-gray-400 ml-2">— {song.artist}</span>)}
-                  {(()=>{const p=profiles.get(song.user_id||"");return p?<span className="inline-flex items-center gap-1 text-xs text-gray-400 ml-2"><img src={p.avatar_url||""} alt="" className="w-3 h-3 rounded-full object-cover" onError={e=>{(e.target as HTMLImageElement).style.display="none"}}/>{p.username}</span>:null})()}
+                  <span className="text-sm font-medium text-ink-700">🎶 {song.title}</span>
+                  {song.artist && (<span className="text-xs text-ink-400 ml-2">— {song.artist}</span>)}
+                  {(()=>{const p=profiles.get(song.user_id||"");return p?<span className="inline-flex items-center gap-1 text-xs text-ink-400 ml-2"><img src={p.avatar_url||""} alt="" className="w-3 h-3 rounded-full object-cover" onError={e=>{(e.target as HTMLImageElement).style.display="none"}}/>{p.username}</span>:null})()}
                 </div>
               </div>
               {user && (
                 <button onClick={() => handleDelete(song.id)}
-                  className="text-xs text-gray-300 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-2">
+                  className="text-xs text-ink-200 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-2">
                   删除
                 </button>
               )}
@@ -114,5 +118,3 @@ function formatTime(sec: number): string {
   const s = sec % 60;
   return m + ":" + String(s).padStart(2, "0");
 }
-
-

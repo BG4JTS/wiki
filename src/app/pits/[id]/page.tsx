@@ -42,7 +42,10 @@ export default function PitDetailPage() {
     const r = await supabase.from("pits").select("*").eq("id", id).single() as { data: PitData | null; error: unknown };
     if (!r.data) { notFound(); return; }
     setPit(r.data);
-    if (r.data.user_id) { supabase.from("user_profiles").select("username,avatar_url").eq("id",r.data.user_id).single().then(({data:pd})=>{if(pd)setPitAuthor(pd as {username:string;avatar_url:string})}); }
+    if (r.data.user_id) {
+      supabase.from("user_profiles").select("username,avatar_url").eq("id",r.data.user_id).single()
+        .then(({data:pd})=>{if(pd)setPitAuthor(pd as {username:string;avatar_url:string})});
+    }
 
     if (r.data.episode_id) {
       const ep = await supabase.from("episodes").select("title").eq("id", r.data.episode_id).single() as { data: EpMeta | null; error: unknown };
@@ -74,27 +77,41 @@ export default function PitDetailPage() {
 
   const handleFillVoted = () => load();
 
-  if (loading) return <div className="text-center py-20 text-gray-400">加载中...</div>;
+  if (loading) return (
+    <div className="animate-fade-in space-y-4">
+      <div className="skeleton h-6 w-20 rounded-full" />
+      <div className="skeleton h-8 w-64" />
+      <div className="skeleton h-4 w-48" />
+      <div className="skeleton h-20 w-full rounded-xl" />
+    </div>
+  );
   if (!pit) return null;
 
   const statusLabel: Record<string, string> = { open: "🕳 开放", pending: "⏳ 待填", filled: "✅ 已填" };
-  const sc: Record<string, string> = { open: "bg-gray-100 text-gray-600", pending: "bg-yellow-100 text-yellow-700", filled: "bg-green-100 text-green-700" };
+  const sc: Record<string, string> = { open: "badge-brand", pending: "badge-pending", filled: "badge-published" };
 
   return (
-    <div>
-      <div className="mb-6">
-        <span className={`text-xs px-2 py-0.5 rounded-full ${sc[pit.status]}`}>{statusLabel[pit.status]}</span>
-        <h1 className="text-2xl font-bold mt-2">{pit.title}</h1>
-        {pitAuthor && <div className="flex items-center gap-1 mt-1 text-xs text-gray-400"><img src={pitAuthor.avatar_url||""} alt="" className="w-4 h-4 rounded-full object-cover" onError={e=>{(e.target as HTMLImageElement).style.display="none"}} /><span>{pitAuthor.username}</span></div>}
-        <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm mt-1 text-gray-500">
+    <div className="animate-fade-in-up">
+      <div className="mb-8">
+        <span className={`badge ${sc[pit.status]} mb-3`}>{statusLabel[pit.status]}</span>
+        <h1 className="text-2xl font-bold text-ink-800 mt-2">{pit.title}</h1>
+        {pitAuthor && (
+          <div className="flex items-center gap-1.5 mt-2 text-xs text-ink-400">
+            <img src={pitAuthor.avatar_url||""} alt="" className="w-4 h-4 rounded-full object-cover" onError={e=>{(e.target as HTMLImageElement).style.display="none"}} />
+            <span>{pitAuthor.username}</span>
+          </div>
+        )}
+        <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm mt-2 text-ink-500">
           {episodeTitle && (
-            <span>📄 <Link href={`/episodes/${pit.episode_id}`} className="text-indigo-500 hover:underline">{episodeTitle}</Link></span>
+            <span className="flex items-center gap-1">
+              📄 <Link href={`/episodes/${pit.episode_id}`} className="text-brand-500 hover:text-brand-600 font-medium">{episodeTitle}</Link>
+            </span>
           )}
           {pit.timestamp_sec != null && (
-            <span>⏱ {formatTime(pit.timestamp_sec)}</span>
+            <span className="flex items-center gap-1">⏱ {formatTime(pit.timestamp_sec)}</span>
           )}
         </div>
-        {pit.description && <p className="text-gray-600 mt-2">{pit.description}</p>}
+        {pit.description && <p className="text-ink-500 text-sm mt-3 leading-relaxed">{pit.description}</p>}
         <PitVoter pitId={pit.id} upVotes={pit.up_votes} downVotes={pit.down_votes} userId={userId} onVoted={handleStatusChange} />
       </div>
 
@@ -104,4 +121,3 @@ export default function PitDetailPage() {
     </div>
   );
 }
-

@@ -28,10 +28,8 @@ interface TimelineData {
   description: string;
 }
 
-// ---- 静态路径 ----
 export const dynamic = 'force-dynamic';
 
-// ---- 页面组件 ----
 export default async function EpisodePage({
   params,
 }: {
@@ -57,47 +55,63 @@ export default async function EpisodePage({
       .order("timestamp_sec");
     timelines = (tlResult.data ?? []) as TimelineData[];
   } catch {
-    // query failed, show not found
+    // query failed
   }
   if (!episode) notFound();
 
   const isDraft = episode.status === "draft";
 
   return (
-    <div>
+    <div className="animate-fade-in-up">
+      {/* Header */}
       <div className="mb-8">
         {isDraft && (
-          <span className="inline-block text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700 mb-2">
-            📝 草稿 — 欢迎补充完善
-          </span>
+          <span className="badge badge-draft mb-3">草稿 — 欢迎补充完善</span>
         )}
-        <div className="flex items-baseline gap-3 mb-2">
-          <span className="text-indigo-600 font-mono">
+        {episode.status === "pending" && (
+          <span className="badge badge-pending mb-3">审核中</span>
+        )}
+        <div className="flex items-baseline gap-3 mb-2 flex-wrap">
+          <span className="text-brand-500 font-mono text-lg font-medium">
             #{episode.episode_number}
           </span>
-          <h1 className="text-2xl font-bold">{episode.title}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-ink-800 tracking-tight">
+            {episode.title}
+          </h1>
         </div>
-        <div className="flex gap-4 text-sm text-gray-500 mb-3">
-          <span>{episode.publish_date}</span>
-          <span>{Math.floor(episode.duration / 60)} 分钟</span>
+        <div className="flex items-center gap-4 text-sm text-ink-400 mb-3">
+          <span className="flex items-center gap-1">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            {episode.publish_date}
+          </span>
+          <span className="flex items-center gap-1">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            {Math.floor(episode.duration / 60)} 分钟
+          </span>
         </div>
-        <p className="text-gray-600">{episode.description}</p>
+        {episode.description && (
+          <p className="text-ink-500 text-sm leading-relaxed max-w-2xl">{episode.description}</p>
+        )}
       </div>
 
       <WikiEditor episode={episode} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-6">
+        {/* 主内容区 */}
+        <div className="lg:col-span-2 space-y-10">
           {timelines.length > 0 && <TimelineViewer timelines={timelines} />}
           <BGMPlaylist episodeId={episode.id} />
           <TranscriptViewer transcript={episode.transcript} />
           <CommentsSection episodeId={episode.id} />
         </div>
-        <div className="lg:col-span-1">
-          <div>
+        {/* 侧边栏 */}
+        <div className="lg:col-span-1 space-y-6">
           <UserContributions episodeId={episode.id} />
           <PitSection episodeId={episode.id} />
-        </div>
         </div>
       </div>
     </div>
