@@ -25,9 +25,11 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user = null;
+  try {
+    const { data } = await supabase.auth.getUser();
+    user = data.user;
+  } catch { /* auth check failed, treat as unauthenticated */ }
 
   // 保护 /profile 和 /admin 路由
   if (!user && request.nextUrl.pathname.startsWith("/profile")) {
