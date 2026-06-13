@@ -153,6 +153,7 @@ export type Database = {
       pit_fill_votes: { Row: { id: number; fill_id: number; user_id: string; vote_type: "up" | "down"; created_at: string }; Insert: Omit<{ id: number; fill_id: number; user_id: string; vote_type: "up" | "down"; created_at: string }, "id" | "created_at">; Update: never; Relationships: [] };
       topics: { Row: Topic; Insert: Omit<Topic, "id" | "created_at" | "up_votes" | "down_votes">; Update: Partial<Omit<Topic, "id" | "user_id">>; Relationships: [] };
       topic_votes: { Row: TopicVote; Insert: Omit<TopicVote, "id" | "created_at">; Update: never; Relationships: [] };
+      site_settings: { Row: { key: string; value: string; updated_at: string }; Insert: { key: string; value: string }; Update: { value: string }; Relationships: [] };
     };
     Views: Record<string, never>;
     Functions: { vote_topic: { Args: { p_topic_id: number; p_vote_type: string }; Returns: void } };

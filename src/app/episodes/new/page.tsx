@@ -20,6 +20,12 @@ export default function NewEpisodePage() {
  const handleSubmit = async () => {
   if (!title.trim()) { setMessage("至少填个标题"); return; }
   setLoading(true); setMessage("");
+  // 检查自动审核设置
+  let status = "draft";
+  try {
+   const sr = await supabase.from("site_settings").select("value").eq("key", "auto_approve_episodes").single() as unknown as { data: { value: string } | null; error: unknown };
+   if (sr.data && sr.data.value === "true") status = "published";
+  } catch { /* 查询失败保持 draft */ }
   const payload = {
    episode_number: parseInt(epNum) || 0,
    title: title.trim(),
@@ -27,11 +33,11 @@ export default function NewEpisodePage() {
    duration: parseTimeInput(durationDisplay),
    description: description.trim(),
    transcript: transcript.trim(),
-   status: "draft",
+   status,
   };
   const { error } = await supabase.from("episodes").insert(payload as never) as unknown as { error: { message: string } | null };
   if (error) { setMessage("提交失败：" + error.message); setLoading(false); return; }
-  setMessage("提交成功！即将跳转到节目页...");
+  setMessage(status === "published" ? "提交成功！节目已自动发布" : "提交成功！等待管理员审核");
   const { data } = await supabase.from("episodes").select("id").order("id", { ascending: false }).limit(1) as { data: { id: number }[] | null; error: unknown };
   if (data?.[0]) { router.push("/episodes/" + data[0].id); }
   else { router.push("/"); }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { parseTimeInput, formatTimeInput } from "@/lib/time";
@@ -15,7 +15,7 @@ type ErrResult = { error: { message: string } | null };
 
 export default function AdminEditor({ episodes, pits }: Props) {
  const router = useRouter(); const supabase = createClient();
- const [tab, setTab] = useState<"episode" | "timeline" | "pits" | "review">("review");
+ const [tab, setTab] = useState<"episode" | "timeline" | "pits" | "review" | "settings">("review");
  const [editId, setEditId] = useState<number | null>(null);
  const [message, setMessage] = useState(""); const [loading, setLoading] = useState(false);
 
@@ -28,6 +28,12 @@ export default function AdminEditor({ episodes, pits }: Props) {
  const [tlList, setTlList] = useState<Timeline[]>([]);
 
  const [pitFilter, setPitFilter] = useState("");
+ const [autoApprove, setAutoApprove] = useState(false);
+ const [settingsLoaded, setSettingsLoaded] = useState(false);
+
+ useEffect(() => {
+  if (tab === "settings" && !settingsLoaded) loadSettings();
+ }, [tab]);
  const fp = pitFilter ? pits.filter(p => p.status === pitFilter) : pits;
 
  const pendingEps = episodes.filter(ep => ep.status === "pending");
@@ -93,6 +99,30 @@ export default function AdminEditor({ episodes, pits }: Props) {
   if(err) setMessage("删除失败："+err.message); else { setMessage("已删除！"); router.refresh(); }
  };
 
+ const loadSettings = async () => {
+  const r = await supabase.from("site_settings").select("key,value") as unknown as { data: {key:string;value:string}[] | null; error: unknown };
+  if (r.data) { const m = new Map(r.data.map((s: {key:string;value:string}) => [s.key, s.value])); setAutoApprove(m.get("auto_approve_episodes") === "true"); }
+  setSettingsLoaded(true);
+ };
+ const saveSetting = async (key: string, value: string) => {
+  await supabase.from("site_settings").upsert({ key, value } as never) as unknown as ErrResult;
+ };
+ const handleAutoApproveToggle = async () => {
+  const next = !autoApprove; setAutoApprove(next);
+  await saveSetting("auto_approve_episodes", String(next));
+  setMessage(next ? "自动审核已开启" : "自动审核已关闭");
+ };
+ const handleClearAllData = async () => {
+  if (!confirm("警告：此操作将清空全部节目、坑、选题、评论、时间轴、BGM等所有数据！")) return;
+  if (!confirm("再次确认：数据不可恢复！确定要清空吗？")) return;
+  const name = prompt("请输入 DELETE ALL DATA 确认：");
+  if (name !== "DELETE ALL DATA") { setMessage("取消：确认文本不匹配"); return; }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const r = await (supabase.rpc as any)("clear_all_data") as { error: { message: string } | null; data: string | null };
+  if (r.error) { setMessage("清空失败：" + r.error.message); return; }
+  setMessage("所有数据已清空"); router.refresh();
+ };
+
  const tabBtn = (t: typeof tab, label: string) => (
   <button onClick={() => setTab(t)}
    className={`text-sm px-4 py-1.5 font-medium transition-all ${
@@ -109,9 +139,39 @@ export default function AdminEditor({ episodes, pits }: Props) {
    {tabBtn("episode", "节目")}
    {tabBtn("timeline", "时间轴")}
    {tabBtn("pits", "坑管理")}
+   {tabBtn("settings", "设置")}
   </div>
 
   {message && <div className={`p-2.5 text-sm mb-4 ${message.includes("成功")||message.includes("已")?"bg-green-100 text-green-600 border-2 border-green-300":"bg-red-100 text-red-600 border-2 border-red-300"}`}>{message}</div>}
+
+  {tab==="settings" && <>
+   {!settingsLoaded ? (
+    <p className="text-sm text-ink-400">加载中...</p>
+   ) : (
+    <div className="space-y-6">
+     <div className="doc-section">
+      <h3 className="doc-section-title">节目设置</h3>
+      <div className="flex items-center justify-between py-2">
+       <div>
+        <p className="font-semibold text-ink-700">自动审核节目</p>
+        <p className="text-xs text-ink-400 mt-0.5">开启后新提交的节目直接发布，无需管理员手动审核</p>
+       </div>
+       <button onClick={handleAutoApproveToggle}
+        className={"w-12 h-6 flex items-center transition-colors relative " + (autoApprove ? "bg-ink-700" : "bg-ink-200")}>
+        <span className={"w-5 h-5 bg-white border-2 border-ink-300 absolute transition-transform " + (autoApprove ? "translate-x-6" : "translate-x-0")} />
+       </button>
+      </div>
+     </div>
+     <div className="doc-section" style={{borderColor:"#dc2626"}}>
+      <h3 className="doc-section-title" style={{color:"#dc2626",borderBottomColor:"#dc2626"}}>危险操作</h3>
+      <p className="text-sm text-ink-500 mb-3">清空站点所有数据，包括节目、坑、选题、评论、时间轴、BGM等。此操作不可恢复。</p>
+      <button onClick={handleClearAllData} style={{background:"#dc2626",borderColor:"#dc2626",color:"#fff"}} className="btn hover:bg-white hover:text-red-600">
+       清空全部数据
+      </button>
+     </div>
+    </div>
+   )}
+  </>}
 
   {tab==="review" && <>
    <h2 className="section-title mb-3">待审核 ({pendingEps.length})</h2>
