@@ -111,6 +111,7 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-1 text-sm">
           <Link href="/episodes/new" className="btn btn-ghost text-xs">+ 提节目</Link>
           <Link href="/pits" className="btn btn-ghost text-xs">🕳 坑</Link>
+          <Link href="/topics" className="btn btn-ghost text-xs">📋 选题</Link>
         </div>
 
         {/* 期号直达 */}
@@ -196,6 +197,7 @@ export default function Navbar() {
           <div className="px-4 py-3 space-y-2">
             <Link href="/episodes/new" className="block px-3 py-2 rounded-lg hover:bg-ink-50 dark:hover:bg-slate-700 text-sm" onClick={()=>setMenuOpen(false)}>+ 提节目</Link>
             <Link href="/pits" className="block px-3 py-2 rounded-lg hover:bg-ink-50 dark:hover:bg-slate-700 text-sm" onClick={()=>setMenuOpen(false)}>🕳 坑</Link>
+            <Link href="/topics" className="block px-3 py-2 rounded-lg hover:bg-ink-50 dark:hover:bg-slate-700 text-sm" onClick={()=>setMenuOpen(false)}>📋 选题库</Link>
             <button onClick={() => { toggleTheme(); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-ink-50 dark:hover:bg-slate-700 text-sm">
               {dark ? "☀️ 亮色模式" : "🌙 暗色模式"}
             </button>

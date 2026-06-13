@@ -118,6 +118,27 @@ export interface BgmSong {
   created_at: string;
 }
 
+
+// ---- 选题库 ----
+export interface Topic {
+  id: number;
+  user_id: string;
+  title: string;
+  description: string;
+  status: "open" | "closed";
+  up_votes: number;
+  down_votes: number;
+  created_at: string;
+  user_profile?: UserProfile | null;
+}
+
+export interface TopicVote {
+  id: number;
+  topic_id: number;
+  user_id: string;
+  vote_type: "up" | "down";
+  created_at: string;
+}
 export type Database = {
   public: {
     Tables: {
@@ -130,9 +151,11 @@ export type Database = {
       pit_votes: { Row: { id: number; pit_id: number; user_id: string; vote_type: "up" | "down"; created_at: string }; Insert: Omit<{ id: number; pit_id: number; user_id: string; vote_type: "up" | "down"; created_at: string }, "id" | "created_at">; Update: never; Relationships: [] };
       pit_fills: { Row: PitFill; Insert: Omit<PitFill, "id" | "created_at" | "up_votes" | "down_votes">; Update: Partial<Omit<PitFill, "id" | "user_id">>; Relationships: [] };
       pit_fill_votes: { Row: { id: number; fill_id: number; user_id: string; vote_type: "up" | "down"; created_at: string }; Insert: Omit<{ id: number; fill_id: number; user_id: string; vote_type: "up" | "down"; created_at: string }, "id" | "created_at">; Update: never; Relationships: [] };
+      topics: { Row: Topic; Insert: Omit<Topic, "id" | "created_at" | "up_votes" | "down_votes">; Update: Partial<Omit<Topic, "id" | "user_id">>; Relationships: [] };
+      topic_votes: { Row: TopicVote; Insert: Omit<TopicVote, "id" | "created_at">; Update: never; Relationships: [] };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: { vote_topic: { Args: { p_topic_id: number; p_vote_type: string }; Returns: void } };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
   };
