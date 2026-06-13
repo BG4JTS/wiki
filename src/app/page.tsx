@@ -37,7 +37,7 @@ export default async function HomePage({
           {episodes.map((ep) => (
             <Link
               key={ep.id}
-              href={/episodes/}
+              href={`/episodes/${ep.id}`}
               className='block bg-white rounded-lg shadow-sm border p-5 hover:shadow-md transition-shadow'
             >
               <div className='flex items-baseline gap-3 mb-2'>
@@ -63,8 +63,12 @@ export default async function HomePage({
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
             <Link
               key={p}
-              href={/?page=}
-              className={px-3 py-1 rounded text-sm }
+              href={`/?page=${p}`}
+              className={`px-3 py-1 rounded text-sm ${
+                p === currentPage
+                  ? 'bg-indigo-600 text-white'
+                  : 'bg-white border hover:bg-gray-50'
+              }`}
             >
               {p}
             </Link>
