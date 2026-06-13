@@ -25,12 +25,13 @@ export default function UserContributions({
   }, [episodeId]);
 
   const loadContributions = async () => {
-    const { data, error } = await supabase
+    const result = await supabase
       .from("user_contributions")
       .select("*, user_profile:user_profiles(username, avatar_url)")
       .eq("episode_id", episodeId)
       .order("votes", { ascending: false })
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false }) as { data: UserContribution[] | null; error: unknown };
+    const data = result.data; const error = result.error;
 
     if (error) setError(error.message);
     else setContributions(data || []);

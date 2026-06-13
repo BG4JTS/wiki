@@ -25,11 +25,12 @@ export default function CommentsSection({ episodeId }: { episodeId: number }) {
   }, [episodeId]);
 
   const loadComments = async () => {
-    const { data, error } = await supabase
+    const result = await supabase
       .from("comments")
       .select("*, user_profile:user_profiles(username, avatar_url)")
       .eq("episode_id", episodeId)
-      .order("created_at", { ascending: true });
+      .order("created_at", { ascending: true }) as { data: CommentWithReplies[] | null; error: unknown };
+    const data = result.data; const error = result.error;
 
     if (error) {
       setError(error.message);

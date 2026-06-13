@@ -29,11 +29,12 @@ export default function Navbar() {
       setResults([]);
       return;
     }
-    const { data } = await supabase
+    const result = await supabase
       .from("episodes")
       .select("id, title, episode_number")
       .or(`title.ilike.%${searchQuery}%,transcript.ilike.%${searchQuery}%`)
-      .limit(5);
+      .limit(5) as { data: { id: number; title: string; episode_number: number }[] | null; error: unknown };
+    const data = result.data;
     setResults(data || []);
   };
 
