@@ -13,7 +13,26 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang='zh-CN'>
+    <html lang='zh-CN' suppressHydrationWarning>
+      <head>
+        {/* 防闪烁脚本 — 在 React hydration 前立即执行 */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var theme = localStorage.getItem('theme');
+                  if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                  } else {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                  }
+                } catch(e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
       <body className='min-h-screen page-bg text-ink'>
         <Navbar />
         <main className='max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10'>

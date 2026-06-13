@@ -21,6 +21,7 @@ export default function Navbar() {
   const [profile, setProfile] = useState<{ username: string; avatar_url: string } | null>(null);
   const [mounted, setMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [dark, setDark] = useState(false);
   const supabaseRef = useRef<ReturnType<typeof createClient> | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
@@ -41,7 +42,18 @@ export default function Navbar() {
     } catch { setProfile(null); }
   };
 
-  useEffect(() => { setMounted(true); }, []);
+  const toggleTheme = () => {
+    const next = !dark;
+    setDark(next);
+    document.documentElement.setAttribute("data-theme", next ? "dark" : "light");
+    try { localStorage.setItem("theme", next ? "dark" : "light"); } catch {}
+  };
+
+  useEffect(() => {
+    setMounted(true);
+    // 从 DOM 读取当前主题 (layout 脚本已设置)
+    setDark(document.documentElement.getAttribute("data-theme") === "dark");
+  }, []);
 
   useEffect(() => {
     if (!mounted) return;
@@ -114,12 +126,12 @@ export default function Navbar() {
               onChange={(e) => { setQuery(e.target.value); setIsOpen(true); }}
               onFocus={() => setIsOpen(true)}
               onBlur={() => setTimeout(() => setIsOpen(false), 200)}
-              className="w-full pl-9 pr-3 py-1.5 text-sm bg-white/60 border border-ink-200 rounded-xl focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/15 transition-all" />
+              className="w-full pl-9 pr-3 py-1.5 text-sm bg-white/60 dark:bg-slate-800/60 border border-ink-200 rounded-xl focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/15 transition-all" />
           </div>
           {isOpen && results.length > 0 && (
-            <div className="absolute top-full mt-1.5 w-full bg-white/95 backdrop-blur-md border border-ink-100 rounded-xl shadow-glass overflow-hidden animate-scale-in">
+            <div className="absolute top-full mt-1.5 w-full bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border border-ink-100 dark:border-slate-600 rounded-xl shadow-glass overflow-hidden animate-scale-in">
               {results.map((ep) => (
-                <Link key={ep.id} href={"/episodes/"+ep.id} className="flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-brand-50 transition-colors">
+                <Link key={ep.id} href={"/episodes/"+ep.id} className="flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-brand-50 dark:hover:bg-slate-700 transition-colors">
                   <span className="text-xs font-mono text-brand-500 shrink-0">#{ep.episode_number}</span>
                   <span className="truncate">{ep.title}</span>
                 </Link>
@@ -128,11 +140,35 @@ export default function Navbar() {
           )}
         </div>
 
+        {/* Theme toggle */}
+        <button
+          onClick={toggleTheme}
+          className="p-1.5 rounded-lg hover:bg-ink-100 dark:hover:bg-slate-700 transition-colors text-ink-500 shrink-0"
+          aria-label="切换暗色模式"
+          title={dark ? "切换到亮色模式" : "切换到暗色模式"}
+        >
+          {mounted ? (
+            dark ? (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+            ) : (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+              </svg>
+            )
+          ) : (
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+          )}
+        </button>
+
         {/* User area - desktop */}
         <div className="hidden md:flex items-center gap-2 text-sm shrink-0">
           {user ? (
             <div className="flex items-center gap-2">
-              <Link href="/profile" className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-ink-50 transition-colors">
+              <Link href="/profile" className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-ink-50 dark:hover:bg-slate-700 transition-colors">
                 {profile?.avatar_url ? (
                   <img src={profile.avatar_url} alt="" className="w-6 h-6 rounded-full object-cover ring-2 ring-brand-100" onError={e=>{(e.target as HTMLImageElement).style.display="none"}} />
                 ) : (
@@ -150,7 +186,7 @@ export default function Navbar() {
         </div>
 
         {/* Mobile menu toggle */}
-        <button className="md:hidden p-1.5 rounded-lg hover:bg-ink-50" onClick={() => setMenuOpen(!menuOpen)}>
+        <button className="md:hidden p-1.5 rounded-lg hover:bg-ink-50 dark:hover:bg-slate-700" onClick={() => setMenuOpen(!menuOpen)}>
           <svg className="w-5 h-5 text-ink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             {menuOpen ? (
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -163,16 +199,19 @@ export default function Navbar() {
 
       {/* Mobile menu dropdown */}
       {menuOpen && (
-        <div className="md:hidden border-t border-ink-100 bg-white/95 backdrop-blur-md animate-scale-in">
+        <div className="md:hidden border-t border-ink-100 dark:border-slate-700 bg-white/95 dark:bg-slate-800/95 backdrop-blur-md animate-scale-in">
           <div className="px-4 py-3 space-y-2">
-            <Link href="/episodes/new" className="block px-3 py-2 rounded-lg hover:bg-ink-50 text-sm" onClick={()=>setMenuOpen(false)}>+ 提节目</Link>
-            <Link href="/pits" className="block px-3 py-2 rounded-lg hover:bg-ink-50 text-sm" onClick={()=>setMenuOpen(false)}>🕳 坑</Link>
+            <Link href="/episodes/new" className="block px-3 py-2 rounded-lg hover:bg-ink-50 dark:hover:bg-slate-700 text-sm" onClick={()=>setMenuOpen(false)}>+ 提节目</Link>
+            <Link href="/pits" className="block px-3 py-2 rounded-lg hover:bg-ink-50 dark:hover:bg-slate-700 text-sm" onClick={()=>setMenuOpen(false)}>🕳 坑</Link>
+            <button onClick={() => { toggleTheme(); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-ink-50 dark:hover:bg-slate-700 text-sm">
+              {dark ? "☀️ 亮色模式" : "🌙 暗色模式"}
+            </button>
             {user ? (
               <>
-                <Link href="/profile" className="block px-3 py-2 rounded-lg hover:bg-ink-50 text-sm" onClick={()=>setMenuOpen(false)}>
+                <Link href="/profile" className="block px-3 py-2 rounded-lg hover:bg-ink-50 dark:hover:bg-slate-700 text-sm" onClick={()=>setMenuOpen(false)}>
                   👤 {profile?.username || user.email}
                 </Link>
-                <button onClick={()=>{handleLogout();setMenuOpen(false);}} className="w-full text-left px-3 py-2 rounded-lg hover:bg-red-50 text-red-500 text-sm">退出</button>
+                <button onClick={()=>{handleLogout();setMenuOpen(false);}} className="w-full text-left px-3 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 text-red-500 text-sm">退出</button>
               </>
             ) : (
               <Link href="/login" className="block px-3 py-2 rounded-lg bg-brand-500 text-white text-center text-sm" onClick={()=>setMenuOpen(false)}>登录</Link>
