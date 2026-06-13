@@ -22,7 +22,7 @@ export default async function PitDetailPage({ params }: { params: Promise<{ id: 
   let pit: PitData | null = null;
   let fills: FillData[] = [];
   let episodeTitle = "";
-  let fillEpisodes: Map<number, string> = new Map();
+  const fillEpisodes: Map<number, string> = new Map();
 
   try {
     const pResult = await supabase.from("pits").select("*").eq("id", id).single() as { data: PitData | null; error: unknown };
