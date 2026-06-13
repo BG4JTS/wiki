@@ -111,6 +111,7 @@ export interface PitFill {
 export interface BgmSong {
   id: number;
   episode_id: number;
+  user_id: string;
   timestamp_sec: number;
   title: string;
   artist: string;
@@ -136,6 +137,7 @@ export type Database = {
     CompositeTypes: Record<string, never>;
   };
 };
+
 
 
 

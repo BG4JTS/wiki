@@ -30,6 +30,7 @@ export default function PitDetailPage() {
   const [pit, setPit] = useState<PitData | null>(null);
   const [fills, setFills] = useState<FillData[]>([]);
   const [episodeTitle, setEpisodeTitle] = useState("");
+  const [pitAuthor, setPitAuthor] = useState<{username:string;avatar_url:string}|null>(null);
   const [fillEps, setFillEps] = useState<Map<number, string>>(new Map());
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -41,6 +42,7 @@ export default function PitDetailPage() {
     const r = await supabase.from("pits").select("*").eq("id", id).single() as { data: PitData | null; error: unknown };
     if (!r.data) { notFound(); return; }
     setPit(r.data);
+    if (r.data.user_id) { supabase.from("user_profiles").select("username,avatar_url").eq("id",r.data.user_id).single().then(({data:pd})=>{if(pd)setPitAuthor(pd as {username:string;avatar_url:string})}); }
 
     if (r.data.episode_id) {
       const ep = await supabase.from("episodes").select("title").eq("id", r.data.episode_id).single() as { data: EpMeta | null; error: unknown };
@@ -83,6 +85,7 @@ export default function PitDetailPage() {
       <div className="mb-6">
         <span className={`text-xs px-2 py-0.5 rounded-full ${sc[pit.status]}`}>{statusLabel[pit.status]}</span>
         <h1 className="text-2xl font-bold mt-2">{pit.title}</h1>
+        {pitAuthor && <div className="flex items-center gap-1 mt-1 text-xs text-gray-400"><img src={pitAuthor.avatar_url||""} alt="" className="w-4 h-4 rounded-full object-cover" onError={e=>{(e.target as HTMLImageElement).style.display="none"}} /><span>{pitAuthor.username}</span></div>}
         <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm mt-1 text-gray-500">
           {episodeTitle && (
             <span>📄 <Link href={`/episodes/${pit.episode_id}`} className="text-indigo-500 hover:underline">{episodeTitle}</Link></span>
@@ -101,3 +104,4 @@ export default function PitDetailPage() {
     </div>
   );
 }
+

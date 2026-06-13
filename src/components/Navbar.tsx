@@ -18,6 +18,7 @@ export default function Navbar() {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<{ username: string; avatar_url: string } | null>(null);
   const [mounted, setMounted] = useState(false);
   const supabaseRef = useRef<ReturnType<typeof createClient> | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -38,6 +39,7 @@ export default function Navbar() {
     if (!supabase) return;
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      if (session?.user) { (async () => { try { const { data: d } = await supabase.from("user_profiles").select("username,avatar_url").eq("id",session.user.id).single() as { data: {username:string;avatar_url:string}|null; error:unknown }; setProfile(d); } catch { setProfile(null); } })(); } else { setProfile(null); }
     });
     return () => subscription.unsubscribe();
   }, [mounted]);
@@ -93,7 +95,7 @@ export default function Navbar() {
         <div className="flex items-center gap-3 text-sm shrink-0">
           {user ? (
             <>
-              <Link href="/profile" className="hover:text-indigo-600">{user.email}</Link>
+              <Link href="/profile" className="hover:text-indigo-600 flex items-center gap-2">{profile?.avatar_url ? <img src={profile.avatar_url} alt="" className="w-5 h-5 rounded-full object-cover" onError={e=>{(e.target as HTMLImageElement).style.display="none"}} /> : null}<span>{profile?.username || user.email}</span></Link>
               <button onClick={handleLogout} className="text-gray-400 hover:text-red-500">退出</button>
             </>
           ) : (
@@ -104,3 +106,6 @@ export default function Navbar() {
     </nav>
   );
 }
+
+
+

@@ -13,6 +13,7 @@ export default function BGMPlaylist({ episodeId }: { episodeId: number }) {
   const [tsSec, setTsSec] = useState("");
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
+  const [profiles, setProfiles] = useState<Map<string,{username:string;avatar_url:string}>>(new Map());
   const [message, setMessage] = useState("");
 
   useEffect(() => {
@@ -27,6 +28,7 @@ export default function BGMPlaylist({ episodeId }: { episodeId: number }) {
       .eq("episode_id", episodeId)
       .order("timestamp_sec") as { data: BgmSong[] | null; error: unknown };
     setSongs(data ?? []);
+    const uids=[...new Set((data??[]).map((s:BgmSong)=>s.user_id||"").filter(Boolean))];if(uids.length){const pr=await supabase.from("user_profiles").select("id,username,avatar_url").in("id",uids)as{data:{id:string;username:string;avatar_url:string}[]|null;error:unknown};if(pr.data)setProfiles(new Map(pr.data.map(p=>[p.id,p])));}
     setLoading(false);
   };
 
@@ -89,9 +91,8 @@ export default function BGMPlaylist({ episodeId }: { episodeId: number }) {
                 </span>
                 <div className="min-w-0">
                   <span className="text-sm font-medium">🎶 {song.title}</span>
-                  {song.artist && (
-                    <span className="text-xs text-gray-400 ml-2">— {song.artist}</span>
-                  )}
+                  {song.artist && (<span className="text-xs text-gray-400 ml-2">— {song.artist}</span>)}
+                  {(()=>{const p=profiles.get(song.user_id||"");return p?<span className="inline-flex items-center gap-1 text-xs text-gray-400 ml-2"><img src={p.avatar_url||""} alt="" className="w-3 h-3 rounded-full object-cover" onError={e=>{(e.target as HTMLImageElement).style.display="none"}}/>{p.username}</span>:null})()}
                 </div>
               </div>
               {user && (
@@ -113,3 +114,5 @@ function formatTime(sec: number): string {
   const s = sec % 60;
   return m + ":" + String(s).padStart(2, "0");
 }
+
+

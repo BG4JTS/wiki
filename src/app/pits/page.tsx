@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 
-interface PitItem { id: number; episode_id: number | null; title: string; status: string; up_votes: number; down_votes: number; created_at: string; episode_title?: string; fill_count?: number; best_fill_id?: number | null; }
+interface PitItem { id: number; episode_id: number | null; user_id: string; title: string; status: string; up_votes: number; down_votes: number; created_at: string; episode_title?: string; fill_count?: number; best_fill_id?: number | null; }
 
 type SortKey = "up_votes" | "created_at";
 
@@ -13,6 +13,7 @@ export default function PitsPage() {
   const [pits, setPits] = useState<PitItem[]>([]);
   const [tab, setTab] = useState<"all" | "open" | "pending" | "filled">("all");
   const [sort, setSort] = useState<SortKey>("up_votes");
+  const [profiles, setProfiles] = useState<Map<string,{username:string;avatar_url:string}>>(new Map());
   const [loading, setLoading] = useState(true);
 
   useEffect(() => { load(); }, []);
@@ -31,6 +32,7 @@ export default function PitsPage() {
       const fr = await supabase.from("pit_fills").select("pit_id").in("pit_id",pitIds) as { data:{pit_id:number}[]|null; error:unknown };
       if(fr.data){ const cm = new Map<number,number>(); fr.data.forEach(f=>cm.set(f.pit_id,(cm.get(f.pit_id)||0)+1)); data.forEach(p=>{p.fill_count=cm.get(p.id)||0;}); }
     }
+    const uids=[...new Set(data.map((p:PitItem)=>p.user_id||"").filter(Boolean))];if(uids.length){const pr=await supabase.from("user_profiles").select("id,username,avatar_url").in("id",uids)as{data:{id:string;username:string;avatar_url:string}[]|null;error:unknown};if(pr.data)setProfiles(new Map(pr.data.map(p=>[p.id,p])));}
     setPits(data); setLoading(false);
   };
 
@@ -75,7 +77,7 @@ export default function PitsPage() {
                   {pit.episode_title&&<p className="text-xs text-indigo-500 mt-0.5">📄 {pit.episode_title}</p>}
                 </div>
                 <div className="flex items-center gap-3 text-xs text-gray-400 shrink-0">
-                  <span>👍 {pit.up_votes}</span><span>👎 {pit.down_votes}</span>
+                  {(()=>{const pp=profiles.get(pit.user_id);return pp?<span className="inline-flex items-center gap-1 mr-3 text-xs text-gray-500"><img src={pp.avatar_url||""} alt="" className="w-3.5 h-3.5 rounded-full object-cover" onError={e=>{(e.target as HTMLImageElement).style.display="none"}}/>{pp.username}</span>:null})()}<span>👍 {pit.up_votes}</span><span>👎 {pit.down_votes}</span>
                   {pit.fill_count?<span>💬 {pit.fill_count}</span>:null}
                 </div>
               </div>
@@ -86,3 +88,4 @@ export default function PitsPage() {
     </div>
   );
 }
+
