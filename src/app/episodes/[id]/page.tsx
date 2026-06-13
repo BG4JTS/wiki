@@ -8,7 +8,7 @@ import UserContributions from '@/components/UserContributions';
 export async function generateStaticParams() {
   const supabase = await createClient();
   const { data } = await supabase.from('episodes').select('id');
-  return (data || []).map((ep) => ({ id: String(ep.id) }));
+  return ((data as { id: number }[]) || []).map((ep) => ({ id: String(ep.id) }));
 }
 
 export default async function EpisodePage({
