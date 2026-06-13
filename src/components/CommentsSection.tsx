@@ -26,10 +26,10 @@ export default function CommentsSection({ episodeId }: { episodeId: number }) {
   const loadComments = async () => {
     const result = await supabase
       .from("comments")
-      .select("*, user_profile:user_profiles(username, avatar_url)")
+      .select("*")
       .eq("episode_id", episodeId)
       .order("created_at", { ascending: true }) as { data: CommentWithReplies[] | null; error: { message: string } | null };
-    const data = result.data; const error = result.error;
+    let data = result.data; const error = result.error;
 
     if (error) {
       setError(error.message);
@@ -41,7 +41,19 @@ export default function CommentsSection({ episodeId }: { episodeId: number }) {
         ...root,
         replies: childComments.filter((c) => c.parent_id === root.id),
       }));
-      setComments(tree);
+          // 批量获取用户资料
+    if (data && data.length > 0) {
+      const userIds = [...new Set(data.map((c) => c.user_id))];
+      const pResult = await supabase
+        .from("user_profiles")
+        .select("id, username, avatar_url")
+        .in("id", userIds) as { data: { id: string; username: string; avatar_url: string }[] | null; error: unknown };
+      if (pResult.data) {
+        const profileMap = new Map(pResult.data.map((p) => [p.id, p]));
+        tree.forEach((c) => { c.user_profile = profileMap.get(c.user_id) ?? null; });
+      }
+    }
+    setComments(tree);
     }
     setLoading(false);
   };

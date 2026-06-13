@@ -27,14 +27,26 @@ export default function UserContributions({
   const loadContributions = async () => {
     const result = await supabase
       .from("user_contributions")
-      .select("*, user_profile:user_profiles(username, avatar_url)")
+      .select("*")
       .eq("episode_id", episodeId)
       .order("votes", { ascending: false })
       .order("created_at", { ascending: false }) as { data: UserContribution[] | null; error: { message: string } | null };
-    const data = result.data; const error = result.error;
+    let data = result.data; const error = result.error;
 
     if (error) setError(error.message);
-    else setContributions(data || []);
+    else     // 批量获取用户资料
+    if (data && data.length > 0) {
+      const userIds = [...new Set(data.map((c) => c.user_id))];
+      const pResult = await supabase
+        .from("user_profiles")
+        .select("id, username, avatar_url")
+        .in("id", userIds) as { data: { id: string; username: string; avatar_url: string }[] | null; error: unknown };
+      if (pResult.data) {
+        const profileMap = new Map(pResult.data.map((p) => [p.id, p]));
+        data.forEach((c) => { c.user_profile = profileMap.get(c.user_id) ?? null; });
+      }
+    }
+    setContributions(data || []);
     setLoading(false);
   };
 
