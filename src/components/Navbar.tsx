@@ -71,12 +71,12 @@ export default function Navbar() {
   try {
    const { data, error } = await supabase
     .from("episodes")
-    .select("id")
+    .select("episode_number")
     .eq("episode_number", n)
-    .limit(1) as unknown as { data: { id: number }[] | null; error: { message: string } | null };
+    .limit(1) as unknown as { data: { episode_number: number }[] | null; error: { message: string } | null };
    if (error) { setLookupMsg("查询失败: " + error.message); return; }
    if (data && data.length > 0) {
-    router.push("/episodes/" + data[0].id);
+    router.push("/episodes/" + n);
     setEpNum(""); setLookupMsg("");
    } else {
     setLookupMsg("没有找到 #" + n + "，");

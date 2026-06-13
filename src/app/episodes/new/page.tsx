@@ -43,9 +43,7 @@ export default function NewEpisodePage() {
   const { error } = await supabase.from("episodes").insert(payload as never) as unknown as { error: { message: string } | null };
   if (error) { setMessage("提交失败：" + error.message); setLoading(false); return; }
   setMessage(status === "published" ? "提交成功！节目已自动发布" : "提交成功！等待管理员审核");
-  const { data } = await supabase.from("episodes").select("id").order("id", { ascending: false }).limit(1) as { data: { id: number }[] | null; error: unknown };
-  if (data?.[0]) { router.push("/episodes/" + data[0].id); }
-  else { router.push("/"); }
+  if (epNum) { router.push("/episodes/" + epNum); } else { router.push("/"); }
  };
 
  return (

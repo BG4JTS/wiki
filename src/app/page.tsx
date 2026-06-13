@@ -127,7 +127,7 @@ export default async function HomePage({
  {episodes.map((ep, i) => (
  <Link
  key={ep.id}
- href={`/episodes/${ep.id}`}
+ href={`/episodes/${ep.episode_number}`}
  className={`card card-interactive p-5 flex flex-col animate-fade-in-up stagger-${Math.min(i + 1, 5)}`}
  >
  <div className="flex items-center gap-2 mb-2">
