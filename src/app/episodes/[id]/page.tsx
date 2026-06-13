@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import type { Episode, Timeline } from '@/types/database';
 import { createClient } from '@/lib/supabase/server';
 import TranscriptViewer from '@/components/TranscriptViewer';
 import TimelineViewer from '@/components/TimelineViewer';
@@ -23,7 +24,7 @@ export default async function EpisodePage({
     .from('episodes')
     .select('*')
     .eq('id', id)
-    .single();
+    .single() as { data: Episode | null; error: unknown };
 
   if (!episode) notFound();
 
@@ -31,7 +32,7 @@ export default async function EpisodePage({
     .from('timelines')
     .select('*')
     .eq('episode_id', id)
-    .order('timestamp_sec');
+    .order('timestamp_sec') as { data: Timeline[] | null; error: unknown };
 
   return (
     <div>
