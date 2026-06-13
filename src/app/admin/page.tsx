@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import AdminEditor from "@/components/AdminEditor";
 
+interface PitItem { id: number; title: string; status: string; up_votes: number; down_votes: number; }
+
 interface AdminEpisodeItem {
   id: number;
   episode_number: number;
@@ -35,5 +37,11 @@ export default async function AdminPage() {
     episodes = [];
   }
 
-  return <AdminEditor episodes={episodes} />;
+  let pits: PitItem[] = [];
+  try {
+    const pResult = await supabase.from("pits").select("id, title, status, up_votes, down_votes").order("created_at", { ascending: false }).limit(50) as { data: PitItem[] | null; error: unknown };
+    pits = pResult.data ?? [];
+  } catch { /* */ }
+
+  return <AdminEditor episodes={episodes} pits={pits} />;
 }
