@@ -6,24 +6,16 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { User } from "@/types/database";
 
-interface SearchResult {
-  id: number;
-  title: string;
-  episode_number: number;
-}
-
 export default function Navbar() {
   const router = useRouter();
-  const [query, setQuery] = useState("");
-  const [results, setResults] = useState<SearchResult[]>([]);
-  const [isOpen, setIsOpen] = useState(false);
+  const [epNum, setEpNum] = useState("");
+  const [lookupMsg, setLookupMsg] = useState("");
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<{ username: string; avatar_url: string } | null>(null);
   const [mounted, setMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [dark, setDark] = useState(false);
   const supabaseRef = useRef<ReturnType<typeof createClient> | null>(null);
-  const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const getSupabase = () => {
     if (!supabaseRef.current) {
@@ -51,7 +43,6 @@ export default function Navbar() {
 
   useEffect(() => {
     setMounted(true);
-    // 从 DOM 读取当前主题 (layout 脚本已设置)
     setDark(document.documentElement.getAttribute("data-theme") === "dark");
   }, []);
 
@@ -71,25 +62,25 @@ export default function Navbar() {
     return () => subscription.unsubscribe();
   }, [mounted]);
 
-  const handleSearch = async (searchQuery: string) => {
-    if (searchQuery.length < 2) { setResults([]); return; }
+  const handleLookup = async (num: string) => {
+    if (!num.trim()) { setLookupMsg(""); return; }
+    const n = parseInt(num, 10);
+    if (isNaN(n) || n <= 0) { setLookupMsg("请输入有效数字"); return; }
     const supabase = getSupabase();
-    if (!supabase) return;
+    if (!supabase) { setLookupMsg("连接失败"); return; }
     const { data, error } = await supabase
       .from("episodes")
-      .select("id, title, episode_number")
-      .ilike("title", `%${searchQuery}%`)
-      .limit(5);
-    if (error) { console.error("搜索失败:", error); }
-    setResults((data ?? []) as SearchResult[]);
+      .select("id")
+      .eq("id", n)
+      .maybeSingle();
+    if (error) { setLookupMsg("查询失败"); return; }
+    if (data) {
+      router.push("/episodes/" + n);
+      setEpNum(""); setLookupMsg("");
+    } else {
+      setLookupMsg("没有找到 #" + n + "，");
+    }
   };
-
-  useEffect(() => {
-    if (!mounted) return;
-    clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => handleSearch(query), 300);
-    return () => clearTimeout(timerRef.current);
-  }, [query, mounted]);
 
   const handleLogout = async () => {
     const supabase = getSupabase();
@@ -117,33 +108,23 @@ export default function Navbar() {
           <Link href="/pits" className="btn btn-ghost text-xs">🕳 坑</Link>
         </div>
 
-        {/* Search */}
-        <div className="relative flex-1 max-w-sm">
-          <div className="relative">
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <input type="text" placeholder="搜索节目..." value={query}
-              onChange={(e) => { setQuery(e.target.value); setIsOpen(true); }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && results.length > 0) {
-                  router.push("/episodes/" + results[0].id);
-                  setQuery(""); setResults([]); setIsOpen(false);
-                }
-                if (e.key === "Escape") { setIsOpen(false); }
-              }}
-              onFocus={() => setIsOpen(true)}
-              onBlur={() => setTimeout(() => setIsOpen(false), 200)}
-              className="w-full pl-9 pr-3 py-1.5 text-sm bg-white/60 dark:bg-slate-800/60 border border-ink-200 rounded-xl focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/15 transition-all" />
-          </div>
-          {isOpen && results.length > 0 && (
-            <div className="absolute top-full mt-1.5 w-full bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border border-ink-100 dark:border-slate-600 rounded-xl shadow-glass overflow-hidden animate-scale-in">
-              {results.map((ep) => (
-                <Link key={ep.id} href={"/episodes/"+ep.id} className="flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-brand-50 dark:hover:bg-slate-700 transition-colors">
-                  <span className="text-xs font-mono text-brand-500 shrink-0">#{ep.episode_number}</span>
-                  <span className="truncate">{ep.title}</span>
-                </Link>
-              ))}
+        {/* 期号直达 */}
+        <div className="relative flex-1 max-w-[160px]">
+          <input
+            type="text"
+            inputMode="numeric"
+            placeholder="# 期号"
+            value={epNum}
+            onChange={(e) => { setEpNum(e.target.value.replace(/\D/g, "")); setLookupMsg(""); }}
+            onKeyDown={(e) => { if (e.key === "Enter") handleLookup(epNum); }}
+            className="w-full px-3 py-1.5 text-sm bg-white/60 dark:bg-slate-800/60 border border-ink-200 rounded-xl focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/15 transition-all text-center font-mono"
+          />
+          {lookupMsg && (
+            <div className="absolute top-full mt-1.5 left-1/2 -translate-x-1/2 bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border border-ink-100 dark:border-slate-600 rounded-xl shadow-glass p-3 text-xs text-center animate-scale-in whitespace-nowrap">
+              {lookupMsg}
+              {lookupMsg.includes("没有找到") && (
+                <Link href="/episodes/new" className="text-brand-500 hover:text-brand-600 font-medium ml-1">现在创建？</Link>
+              )}
             </div>
           )}
         </div>
@@ -153,7 +134,6 @@ export default function Navbar() {
           onClick={toggleTheme}
           className="p-1.5 rounded-lg hover:bg-ink-100 dark:hover:bg-slate-700 transition-colors text-ink-500 shrink-0"
           aria-label="切换暗色模式"
-          title={dark ? "切换到亮色模式" : "切换到暗色模式"}
         >
           {mounted ? (
             dark ? (

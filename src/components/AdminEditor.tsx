@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { parseTimeInput } from "@/lib/time";
+import { parseTimeInput, formatTimeInput } from "@/lib/time";
 import type { Episode, Timeline } from "@/types/database";
 
 interface PitItem { id: number; title: string; status: string; up_votes: number; down_votes: number; }
