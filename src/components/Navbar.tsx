@@ -68,19 +68,24 @@ export default function Navbar() {
     if (isNaN(n) || n <= 0) { setLookupMsg("请输入有效数字"); return; }
     const supabase = getSupabase();
     if (!supabase) { setLookupMsg("连接失败"); return; }
-    const { data, error } = await supabase
-      .from("episodes")
-      .select("id")
-      .eq("id", n)
-      .maybeSingle();
-    if (error) { setLookupMsg("查询失败"); return; }
-    if (data) {
-      router.push("/episodes/" + n);
-      setEpNum(""); setLookupMsg("");
-    } else {
-      setLookupMsg("没有找到 #" + n + "，");
+    try {
+      const { data, error } = await supabase
+        .from("episodes")
+        .select("id")
+        .eq("id", n)
+        .limit(1);
+      if (error) { setLookupMsg("查询失败: " + error.message); return; }
+      if (data && data.length > 0) {
+        router.push("/episodes/" + n);
+        setEpNum(""); setLookupMsg("");
+      } else {
+        setLookupMsg("没有找到 #" + n + "，");
+      }
+    } catch (e) {
+      setLookupMsg("查询失败: " + (e instanceof Error ? e.message : String(e)));
     }
   };
+
 
   const handleLogout = async () => {
     const supabase = getSupabase();
