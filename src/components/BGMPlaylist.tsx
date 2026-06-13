@@ -70,14 +70,23 @@ export default function BGMPlaylist({ episodeId }: { episodeId: number }) {
 
       {showForm && (
         <div className="card p-4 mb-4 space-y-2">
-          <div className="flex gap-2">
-            <input type="number" value={tsSec} onChange={e => setTsSec(e.target.value)}
-              placeholder="秒" className="input w-24" />
-            <input type="text" value={title} onChange={e => setTitle(e.target.value)}
-              placeholder="曲名 *" className="input flex-1" />
+          <div className="flex gap-2 items-end">
+            <div className="w-28 shrink-0">
+              <label className="block text-xs text-ink-400 mb-1">时间(秒)</label>
+              <input type="number" value={tsSec} onChange={e => setTsSec(e.target.value)}
+                placeholder="秒" className="input" />
+            </div>
+            <div className="w-28 shrink-0">
+              <label className="block text-xs text-ink-400 mb-1">艺术家</label>
+              <input type="text" value={artist} onChange={e => setArtist(e.target.value)}
+                placeholder="选填" className="input" />
+            </div>
           </div>
-          <input type="text" value={artist} onChange={e => setArtist(e.target.value)}
-            placeholder="艺术家（选填）" className="input" />
+          <div>
+            <label className="block text-xs text-ink-400 mb-1">曲名 *</label>
+            <input type="text" value={title} onChange={e => setTitle(e.target.value)}
+              placeholder="输入曲名..." className="input" />
+          </div>
           {message && <p className="text-xs text-red-500">{message}</p>}
           <button onClick={handleAdd} className="btn btn-primary w-full text-sm">添加</button>
         </div>

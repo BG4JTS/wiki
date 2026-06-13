@@ -75,12 +75,13 @@ export default function Navbar() {
     if (searchQuery.length < 2) { setResults([]); return; }
     const supabase = getSupabase();
     if (!supabase) return;
-    const result = await supabase
+    const { data, error } = await supabase
       .from("episodes")
       .select("id, title, episode_number")
-      .or(`title.ilike.%${searchQuery}%,transcript.ilike.%${searchQuery}%`)
-      .limit(5) as { data: SearchResult[] | null; error: unknown };
-    setResults(result.data ?? []);
+      .ilike("title", `%${searchQuery}%`)
+      .limit(5);
+    if (error) { console.error("搜索失败:", error); }
+    setResults((data ?? []) as SearchResult[]);
   };
 
   useEffect(() => {
