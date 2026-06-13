@@ -25,11 +25,7 @@ interface TimelineData {
 }
 
 // ---- 静态路径 ----
-export const dynamicParams = true;
-
-export async function generateStaticParams() {
-  return [];
-}
+export const dynamic = 'force-dynamic';
 
 // ---- 页面组件 ----
 export default async function EpisodePage({
