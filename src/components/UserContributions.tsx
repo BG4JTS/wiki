@@ -162,7 +162,7 @@ export default function UserContributions({
               <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
                 <span>{typeLabels[c.content_type]}</span>
                 <span className="font-medium text-gray-700">
-                  {c.user_profile?.username || "匿名"}
+                  {c.user_profile ? (<><img src={c.user_profile.avatar_url || ""} alt="" className="w-4 h-4 rounded-full inline-block mr-1 object-cover" onError={e=>{(e.target as HTMLImageElement).style.display="none"}} />{c.user_profile.username}</>) : "匿名"}
                 </span>
               </div>
               {c.content_type === "image_url" ? (

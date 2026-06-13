@@ -99,7 +99,7 @@ export default function CommentsSection({ episodeId }: { episodeId: number }) {
       <div className="bg-gray-50 rounded-lg p-3 mb-2">
         <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
           <span className="font-medium text-gray-700">
-            {comment.user_profile?.username || "匿名用户"}
+            {comment.user_profile ? (<><img src={comment.user_profile.avatar_url || ""} alt="" className="w-4 h-4 rounded-full inline-block mr-1 object-cover" onError={e=>{(e.target as HTMLImageElement).style.display="none"}} />{comment.user_profile.username}</>) : "匿名用户"}
           </span>
           <span>{new Date(comment.created_at).toLocaleString("zh-CN")}</span>
           {user && user.id === comment.user_id && (
