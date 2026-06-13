@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { parseTimeInput, formatTimeInput } from "@/lib/time";
 import { createClient } from "@/lib/supabase/client";
 
 interface EpFields {
@@ -25,7 +26,7 @@ export default function WikiEditor({ episode }: { episode: EpFields & { id: numb
   const [epNum, setEpNum] = useState(String(episode.episode_number));
   const [title, setTitle] = useState(episode.title);
   const [publishDate, setPublishDate] = useState(episode.publish_date);
-  const [duration, setDuration] = useState(String(episode.duration));
+  const [durationDisplay, setDurationDisplay] = useState(formatTimeInput(episode.duration));
   const [description, setDescription] = useState(episode.description);
   const [transcript, setTranscript] = useState(episode.transcript);
 
@@ -33,7 +34,7 @@ export default function WikiEditor({ episode }: { episode: EpFields & { id: numb
     setEpNum(String(episode.episode_number));
     setTitle(episode.title);
     setPublishDate(episode.publish_date);
-    setDuration(String(episode.duration));
+    setDurationDisplay(formatTimeInput(episode.duration));
     setDescription(episode.description);
     setTranscript(episode.transcript);
     setEditing(field);
@@ -46,7 +47,7 @@ export default function WikiEditor({ episode }: { episode: EpFields & { id: numb
       episode_number: parseInt(epNum) || 0,
       title: title.trim(),
       publish_date: publishDate,
-      duration: parseInt(duration) || 0,
+      duration: parseTimeInput(durationDisplay),
       description: description.trim(),
       transcript: transcript.trim(),
     };
@@ -90,15 +91,15 @@ export default function WikiEditor({ episode }: { episode: EpFields & { id: numb
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <label className="block text-xs font-medium text-ink-500 mb-1">期号</label>
-              <input type="number" value={epNum} onChange={e => setEpNum(e.target.value)} className="input" />
+              <input type="text" placeholder="12:34" value={epNum} onChange={e => setEpNum(e.target.value)} className="input" />
             </div>
             <div>
               <label className="block text-xs font-medium text-ink-500 mb-1">日期</label>
               <input type="date" value={publishDate} onChange={e => setPublishDate(e.target.value)} className="input" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-ink-500 mb-1">时长(秒)</label>
-              <input type="number" value={duration} onChange={e => setDuration(e.target.value)} className="input" />
+              <label className="block text-xs font-medium text-ink-500 mb-1">时长（分:秒）</label>
+              <input type="text" placeholder="12:34" value={durationDisplay} onChange={e => setDurationDisplay(e.target.value)} className="input" />
             </div>
           </div>
           <div>

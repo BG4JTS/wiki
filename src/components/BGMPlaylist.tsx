@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { parseTimeInput } from "@/lib/time";
 import type { User, BgmSong } from "@/types/database";
 
 export default function BGMPlaylist({ episodeId }: { episodeId: number }) {
@@ -10,7 +11,7 @@ export default function BGMPlaylist({ episodeId }: { episodeId: number }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [tsSec, setTsSec] = useState("");
+  const [tsSecDisplay, setTsSecDisplay] = useState("");
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
   const [profiles, setProfiles] = useState<Map<string,{username:string;avatar_url:string}>>(new Map());
@@ -41,12 +42,12 @@ export default function BGMPlaylist({ episodeId }: { episodeId: number }) {
     setMessage("");
     const { error } = await supabase.from("bgm_playlist").insert({
       episode_id: episodeId,
-      timestamp_sec: parseInt(tsSec) || 0,
+      timestamp_sec: parseTimeInput(tsSecDisplay),
       title: title.trim(),
       artist: artist.trim(),
     } as never);
     if (error) { setMessage(error.message); return; }
-    setTsSec(""); setTitle(""); setArtist(""); setShowForm(false);
+    setTsSecDisplay(""); setTitle(""); setArtist(""); setShowForm(false);
     loadSongs();
   };
 
@@ -72,9 +73,9 @@ export default function BGMPlaylist({ episodeId }: { episodeId: number }) {
         <div className="card p-4 mb-4 space-y-2">
           <div className="flex gap-2 items-end">
             <div className="w-28 shrink-0">
-              <label className="block text-xs text-ink-400 mb-1">时间(秒)</label>
-              <input type="number" value={tsSec} onChange={e => setTsSec(e.target.value)}
-                placeholder="秒" className="input" />
+              <label className="block text-xs text-ink-400 mb-1">时间（分:秒）</label>
+              <input type="text" value={tsSecDisplay} onChange={e => setTsSecDisplay(e.target.value)}
+                placeholder="12:34" className="input" />
             </div>
             <div className="w-28 shrink-0">
               <label className="block text-xs text-ink-400 mb-1">艺术家</label>

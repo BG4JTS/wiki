@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { parseTimeInput } from "@/lib/time";
 import { createClient } from "@/lib/supabase/client";
 
 interface FillItem {
@@ -17,16 +18,16 @@ export default function FillSection({ pitId, pitStatus, fills, fillEpisodes, use
   const supabase = createClient();
   const [showForm, setShowForm] = useState(false);
   const [desc, setDesc] = useState(""); const [epId, setEpId] = useState("");
-  const [tsSec, setTsSec] = useState(""); const [error, setError] = useState("");
+  const [tsDisplay, setTsDisplay] = useState(""); const [error, setError] = useState("");
 
   const handleSubmit = async () => {
     if(!desc.trim()||!userId) return;
     const { error: err } = await supabase.from("pit_fills").insert({
       pit_id:pitId, user_id:userId, description:desc.trim(),
-      episode_id:epId?parseInt(epId):null, timestamp_sec:tsSec?parseInt(tsSec):null
+      episode_id:epId?parseInt(epId):null, timestamp_sec:tsDisplay?parseTimeInput(tsDisplay):null
     } as never);
     if(err){ setError(err.message); return; }
-    setDesc(""); setEpId(""); setTsSec(""); setShowForm(false); onVoted?.();
+    setDesc(""); setEpId(""); setTsDisplay(""); setShowForm(false); onVoted?.();
   };
 
   const voteFill = async (fillId: number, type: "up"|"down") => {
@@ -47,7 +48,7 @@ export default function FillSection({ pitId, pitStatus, fills, fillEpisodes, use
         <div className="card p-4 mb-4 space-y-2">
           <textarea value={desc} onChange={e=>setDesc(e.target.value)} rows={3} placeholder="你的解答..." className="input resize-none" />
           <input type="number" value={epId} onChange={e=>setEpId(e.target.value)} placeholder="引用节目 ID" className="input" />
-          <input type="number" value={tsSec} onChange={e=>setTsSec(e.target.value)} placeholder="时间戳(秒)" className="input" />
+          <input type="text" value={tsDisplay} onChange={e=>setTsDisplay(e.target.value)} placeholder="12:34" className="input" />
           {error&&<p className="text-xs text-red-500">{error}</p>}
           <button onClick={handleSubmit} className="btn btn-primary w-full text-sm">提交</button>
         </div>

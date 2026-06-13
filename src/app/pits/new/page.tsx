@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { parseTimeInput } from "@/lib/time";
 import { createClient } from "@/lib/supabase/client";
 
 export default function NewPitPage() {
@@ -11,7 +12,7 @@ export default function NewPitPage() {
   const [description, setDescription] = useState("");
   const [episodeId, setEpisodeId] = useState("");
   const [error, setError] = useState("");
-  const [timestampSec, setTimestampSec] = useState("");
+  const [tsDisplay, setTsDisplay] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
@@ -22,7 +23,7 @@ export default function NewPitPage() {
       title: title.trim(),
       description: description.trim(),
       episode_id: episodeId ? parseInt(episodeId) : null,
-      timestamp_sec: timestampSec ? parseInt(timestampSec) : null,
+      timestamp_sec: tsDisplay ? parseTimeInput(tsDisplay) : null,
       user_id: (await supabase.auth.getUser()).data.user?.id,
     } as never);
     if (err) { setError(err.message); setLoading(false); return; }
@@ -51,9 +52,8 @@ export default function NewPitPage() {
             placeholder="例如：5" className="input" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-ink-600 mb-1.5">时间戳（秒，可选）</label>
-          <input type="number" value={timestampSec} onChange={e => setTimestampSec(e.target.value)}
-            placeholder="例如：3600" className="input" />
+          <label className="block text-sm font-medium text-ink-600 mb-1.5">时间戳（分:秒，可选）</label>
+          <input type="text" value={tsDisplay} onChange={e => setTsDisplay(e.target.value)} placeholder="12:34" className="input" />
         </div>
         <button onClick={handleSubmit} disabled={loading || !title.trim()} className="btn btn-primary w-full">
           {loading ? "提交中..." : "挖坑"}

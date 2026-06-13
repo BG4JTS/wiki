@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { parseTimeInput } from "@/lib/time";
 import { createClient } from "@/lib/supabase/client";
 
 export default function NewEpisodePage() {
@@ -10,7 +11,7 @@ export default function NewEpisodePage() {
   const [epNum, setEpNum] = useState("");
   const [title, setTitle] = useState("");
   const [publishDate, setPublishDate] = useState("");
-  const [duration, setDuration] = useState("");
+  const [durationDisplay, setDurationDisplay] = useState("");
   const [description, setDescription] = useState("");
   const [transcript, setTranscript] = useState("");
   const [message, setMessage] = useState("");
@@ -23,7 +24,7 @@ export default function NewEpisodePage() {
       episode_number: parseInt(epNum) || 0,
       title: title.trim(),
       publish_date: publishDate || new Date().toISOString().split("T")[0],
-      duration: parseInt(duration) || 0,
+      duration: parseTimeInput(durationDisplay),
       description: description.trim(),
       transcript: transcript.trim(),
       status: "draft",
@@ -57,8 +58,8 @@ export default function NewEpisodePage() {
           <input type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="节目标题" className="input" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-ink-600 mb-1.5">时长（秒）</label>
-          <input type="number" value={duration} onChange={e => setDuration(e.target.value)} placeholder="如 3600" className="input" />
+          <label className="block text-sm font-medium text-ink-600 mb-1.5">时长（分:秒）</label>
+          <input type="text" value={durationDisplay} onChange={e => setDurationDisplay(e.target.value)} placeholder="12:34" className="input" />
         </div>
         <div>
           <label className="block text-sm font-medium text-ink-600 mb-1.5">简介</label>

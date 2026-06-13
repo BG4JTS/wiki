@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { parseTimeInput } from "@/lib/time";
 import type { Episode, Timeline } from "@/types/database";
 
 interface PitItem { id: number; title: string; status: string; up_votes: number; down_votes: number; }
@@ -19,10 +20,10 @@ export default function AdminEditor({ episodes, pits }: Props) {
   const [message, setMessage] = useState(""); const [loading, setLoading] = useState(false);
 
   const [epNum, setEpNum] = useState(""); const [title, setTitle] = useState("");
-  const [publishDate, setPublishDate] = useState(""); const [duration, setDuration] = useState("");
+  const [publishDate, setPublishDate] = useState(""); const [durationDisplay, setDurationDisplay] = useState("");
   const [description, setDescription] = useState(""); const [transcript, setTranscript] = useState("");
 
-  const [timelineEpId, setTimelineEpId] = useState(""); const [tlTimestamp, setTlTimestamp] = useState("");
+  const [timelineEpId, setTimelineEpId] = useState(""); const [tlDisplay, setTlDisplay] = useState("");
   const [tlTitle, setTlTitle] = useState(""); const [tlDescription, setTlDescription] = useState("");
   const [tlList, setTlList] = useState<Timeline[]>([]);
 
@@ -36,14 +37,14 @@ export default function AdminEditor({ episodes, pits }: Props) {
   const handleLoadEpisode = async (id: number) => {
     setEditId(id);
     const r = await supabase.from("episodes").select("*").eq("id", id).single() as unknown as { data: Episode | null; error: unknown };
-    if (r.data) { setEpNum(String(r.data.episode_number)); setTitle(r.data.title); setPublishDate(r.data.publish_date); setDuration(String(r.data.duration)); setDescription(r.data.description); setTranscript(r.data.transcript); }
+    if (r.data) { setEpNum(String(r.data.episode_number)); setTitle(r.data.title); setPublishDate(r.data.publish_date); setDurationDisplay(formatTimeInput(r.data.duration)); setDescription(r.data.description); setTranscript(r.data.transcript); }
     setTab("episode");
   };
-  const handleReset = () => { setEditId(null); setEpNum(""); setTitle(""); setPublishDate(""); setDuration(""); setDescription(""); setTranscript(""); };
+  const handleReset = () => { setEditId(null); setEpNum(""); setTitle(""); setPublishDate(""); setDurationDisplay(""); setDescription(""); setTranscript(""); };
 
   const handleSaveEpisode = async () => {
     if (!title.trim()) return; setLoading(true); setMessage("");
-    const payload: Record<string,unknown> = { episode_number: parseInt(epNum)||0, title:title.trim(), publish_date:publishDate||new Date().toISOString().split("T")[0], duration:parseInt(duration)||0, description:description.trim(), transcript:transcript.trim() };
+    const payload: Record<string,unknown> = { episode_number: parseInt(epNum)||0, title:title.trim(), publish_date:publishDate||new Date().toISOString().split("T")[0], duration:parseTimeInput(durationDisplay), description:description.trim(), transcript:transcript.trim() };
     let err;
     if (editId) ({ error: err } = await (supabase.from("episodes").update(payload as never).eq("id",editId)) as unknown as ErrResult);
     else ({ error: err } = await (supabase.from("episodes").insert(payload as never)) as unknown as ErrResult);
@@ -74,8 +75,8 @@ export default function AdminEditor({ episodes, pits }: Props) {
   };
   const handleAddTimeline = async () => {
     if(!tlTitle.trim()||!timelineEpId) return; setLoading(true);
-    const { error: err } = await (supabase.from("timelines").insert({ episode_id:parseInt(timelineEpId), timestamp_sec:parseInt(tlTimestamp)||0, title:tlTitle.trim(), description:tlDescription.trim() } as never)) as unknown as ErrResult;
-    if(err) setMessage("添加失败："+err.message); else { setTlTimestamp(""); setTlTitle(""); setTlDescription(""); handleLoadTimelines(parseInt(timelineEpId)); }
+    const { error: err } = await (supabase.from("timelines").insert({ episode_id:parseInt(timelineEpId), timestamp_sec:parseTimeInput(tlDisplay), title:tlTitle.trim(), description:tlDescription.trim() } as never)) as unknown as ErrResult;
+    if(err) setMessage("添加失败："+err.message); else { setTlDisplay(""); setTlTitle(""); setTlDescription(""); handleLoadTimelines(parseInt(timelineEpId)); }
     setLoading(false);
   };
   const handleDeleteTimeline = async (id: number) => {
@@ -202,7 +203,7 @@ export default function AdminEditor({ episodes, pits }: Props) {
         <div className="grid grid-cols-3 gap-3">
           <div><label className="block text-xs font-medium text-ink-500 mb-1">期号</label><input type="number" value={epNum} onChange={e=>setEpNum(e.target.value)} className="input" /></div>
           <div><label className="block text-xs font-medium text-ink-500 mb-1">日期</label><input type="date" value={publishDate} onChange={e=>setPublishDate(e.target.value)} className="input" /></div>
-          <div><label className="block text-xs font-medium text-ink-500 mb-1">时长(秒)</label><input type="number" value={duration} onChange={e=>setDuration(e.target.value)} className="input" /></div>
+          <div><label className="block text-xs font-medium text-ink-500 mb-1">时长（分:秒）</label><input type="text" value={durationDisplay} onChange={e=>setDurationDisplay(e.target.value)} placeholder="12:34" className="input" /></div>
         </div>
         <div><label className="block text-xs font-medium text-ink-500 mb-1">标题</label><input type="text" value={title} onChange={e=>setTitle(e.target.value)} className="input" /></div>
         <div><label className="block text-xs font-medium text-ink-500 mb-1">简介</label><textarea value={description} onChange={e=>setDescription(e.target.value)} rows={2} className="input resize-none" /></div>
@@ -235,7 +236,7 @@ export default function AdminEditor({ episodes, pits }: Props) {
           </div>
           <div className="border-t border-ink-100 pt-4 space-y-2">
             <div className="flex gap-2">
-              <input type="number" value={tlTimestamp} onChange={e=>setTlTimestamp(e.target.value)} placeholder="秒" className="input w-24" />
+              <input type="text" value={tlDisplay} onChange={e=>setTlDisplay(e.target.value)} placeholder="12:34" className="input w-24" />
               <input type="text" value={tlTitle} onChange={e=>setTlTitle(e.target.value)} placeholder="标题" className="input flex-1" />
             </div>
             <input type="text" value={tlDescription} onChange={e=>setTlDescription(e.target.value)} placeholder="说明" className="input" />
