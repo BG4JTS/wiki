@@ -2,10 +2,13 @@
 -- 请在 Supabase SQL Editor 中执行此文件
 -- https://supabase.com/dashboard/project/_/sql/new
 
--- 1. episodes 表 — 任何人都可读
-CREATE POLICY "episodes_select" ON episodes FOR SELECT USING (true);
+-- 1. episodes 表 — 任何人都可读（幂等：已存在则跳过）
+DO $$ BEGIN
+  CREATE POLICY "episodes_select" ON episodes FOR SELECT USING (true);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
--- 2. timelines 表 — 任何人都可读
+-- 2. timelines 表 — 任何人都可读（幂等：先删再建）
 DROP POLICY IF EXISTS "timelines_select" ON timelines;
 CREATE POLICY "timelines_select" ON timelines FOR SELECT USING (true);
 
