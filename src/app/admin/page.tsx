@@ -16,7 +16,7 @@ export default async function AdminPage() {
   if (!user) redirect("/login");
 
   const adminEmail = process.env.ADMIN_EMAIL;
-  if (adminEmail && user.email !== adminEmail) {
+  if (adminEmail && user.email?.toLowerCase().trim() !== adminEmail.toLowerCase().trim()) {
     return (
       <div className="text-center py-20">
         <p className="text-lg text-gray-500">无权访问管理后台</p>
