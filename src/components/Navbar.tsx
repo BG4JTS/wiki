@@ -124,6 +124,13 @@ export default function Navbar() {
             </svg>
             <input type="text" placeholder="搜索节目..." value={query}
               onChange={(e) => { setQuery(e.target.value); setIsOpen(true); }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && results.length > 0) {
+                  router.push("/episodes/" + results[0].id);
+                  setQuery(""); setResults([]); setIsOpen(false);
+                }
+                if (e.key === "Escape") { setIsOpen(false); }
+              }}
               onFocus={() => setIsOpen(true)}
               onBlur={() => setTimeout(() => setIsOpen(false), 200)}
               className="w-full pl-9 pr-3 py-1.5 text-sm bg-white/60 dark:bg-slate-800/60 border border-ink-200 rounded-xl focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/15 transition-all" />

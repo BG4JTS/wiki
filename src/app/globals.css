@@ -268,11 +268,11 @@ body {
 
 [data-theme="dark"] {
   /* 表面 & 背景 */
-  --color-surface: #0f172a;
+  --color-surface: #111827;
   --color-ink: #e2e8f0;
 
   /* 中性色调翻转 (深→浅) */
-  --color-ink-50: #1e293b;
+  --color-ink-50: #1f2937;
   --color-ink-100: #334155;
   --color-ink-200: #475569;
   --color-ink-300: #64748b;
@@ -316,12 +316,12 @@ body {
 
 /* ═══════════ 暗色组件覆写 ═══════════ */
 [data-theme="dark"] .card {
-  background: #1e293b;
+  background: #1f2937;
   border-color: #334155;
 }
 
 [data-theme="dark"] .input {
-  background: #1e293b;
+  background: #1f2937;
   color: #e2e8f0;
   border-color: #475569;
 }
@@ -334,13 +334,13 @@ body {
 }
 
 [data-theme="dark"] .btn-outline {
-  background: #1e293b;
+  background: #1f2937;
   border-color: #475569;
   color: #cbd5e1;
 }
 [data-theme="dark"] .btn-outline:hover:not(:disabled) {
   border-color: var(--color-brand-300);
-  background: #0f172a;
+  background: #111827;
 }
 
 [data-theme="dark"] .btn-ghost {
@@ -353,7 +353,7 @@ body {
 
 /* Navbar 玻璃拟态暗色 */
 [data-theme="dark"] .navbar-glass {
-  background: rgb(15 23 42 / 0.78);
+  background: rgb(17 24 39 / 0.78);
   border-bottom-color: rgb(255 255 255 / 0.06);
 }
 
@@ -362,7 +362,7 @@ body {
   background:
     radial-gradient(ellipse 80% 60% at 50% -10%, rgb(52 179 240 / 0.04), transparent),
     radial-gradient(ellipse 60% 50% at 100% 100%, rgb(184 149 107 / 0.03), transparent),
-    #0f172a;
+    #111827;
 }
 
 /* Badge 微调 */
@@ -394,5 +394,5 @@ body {
 /* 全局选择背景 */
 [data-theme="dark"] ::selection {
   background: var(--color-brand-200);
-  color: #0f172a;
+  color: #111827;
 }
