@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
-import type { Comment } from "@/types/database";
+import type { Comment, User } from "@/types/database";
 
 interface CommentWithReplies extends Comment {
   replies?: CommentWithReplies[];
@@ -16,7 +16,7 @@ export default function CommentsSection({ episodeId }: { episodeId: number }) {
   const [replyContent, setReplyContent] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const supabase = createClient();
 
   useEffect(() => {

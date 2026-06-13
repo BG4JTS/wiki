@@ -39,7 +39,7 @@ export default async function ProfilePage() {
             <p className='text-sm text-gray-400'>暂无评论</p>
           ) : (
             <div className='space-y-2'>
-              {comments.map((c: any) => (
+              {comments.map((c: { id: number; content: string; created_at: string; episode: { title: string } | null }) => (
                 <div
                   key={c.id}
                   className='bg-white border rounded-lg p-3 text-sm'

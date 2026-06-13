@@ -3,13 +3,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import type { UserProfile } from "@/types/database";
+import type { User, UserProfile } from "@/types/database";
 
 export default function ProfileEditor({
   user,
   profile,
 }: {
-  user: any;
+  user: User;
   profile: UserProfile | null;
 }) {
   const router = useRouter();

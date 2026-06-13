@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import type { UserContribution } from "@/types/database";
+import type { UserContribution, User } from "@/types/database";
 
 export default function UserContributions({
   episodeId,
@@ -16,7 +16,7 @@ export default function UserContributions({
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const supabase = createClient();
 
   useEffect(() => {

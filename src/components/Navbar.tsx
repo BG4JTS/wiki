@@ -1,18 +1,19 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import type { Episode } from "@/types/database";
+import type { Episode, User } from "@/types/database";
 
 export default function Navbar() {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Episode[]>([]);
   const [isOpen, setIsOpen] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const supabase = createClient();
+  const timerRef = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {
     const {
@@ -23,26 +24,24 @@ export default function Navbar() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const handleSearch = useCallback(
-    async (searchQuery: string) => {
-      if (searchQuery.length < 2) {
-        setResults([]);
-        return;
-      }
-      const { data } = await supabase
-        .from("episodes")
-        .select("id, title, episode_number")
-        .or(`title.ilike.%${searchQuery}%,transcript.ilike.%${searchQuery}%`)
-        .limit(5);
-      setResults(data || []);
-    },
-    [supabase]
-  );
+  const handleSearch = async (searchQuery: string) => {
+    if (searchQuery.length < 2) {
+      setResults([]);
+      return;
+    }
+    const { data } = await supabase
+      .from("episodes")
+      .select("id, title, episode_number")
+      .or(`title.ilike.%${searchQuery}%,transcript.ilike.%${searchQuery}%`)
+      .limit(5);
+    setResults(data || []);
+  };
 
   useEffect(() => {
-    const timer = setTimeout(() => handleSearch(query), 300);
-    return () => clearTimeout(timer);
-  }, [query, handleSearch]);
+    clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => handleSearch(query), 300);
+    return () => clearTimeout(timerRef.current);
+  }, [query]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
