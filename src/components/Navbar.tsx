@@ -18,33 +18,52 @@ export default function Navbar() {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
-  const supabase = createClient();
+  const [mounted, setMounted] = useState(false);
+  const supabaseRef = useRef<ReturnType<typeof createClient> | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
+  const getSupabase = () => {
+    if (!supabaseRef.current) {
+      try { supabaseRef.current = createClient(); }
+      catch { return null; }
+    }
+    return supabaseRef.current;
+  };
+
+  useEffect(() => { setMounted(true); }, []);
+
   useEffect(() => {
+    if (!mounted) return;
+    const supabase = getSupabase();
+    if (!supabase) return;
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
     return () => subscription.unsubscribe();
-  }, []);
+  }, [mounted]);
 
   const handleSearch = async (searchQuery: string) => {
     if (searchQuery.length < 2) { setResults([]); return; }
+    const supabase = getSupabase();
+    if (!supabase) return;
     const result = await supabase
       .from("episodes")
       .select("id, title, episode_number")
-      .or("title.ilike.%25" + searchQuery + "%25,transcript.ilike.%25" + searchQuery + "%25")
+      .or("title.ilike.%25"+searchQuery+"%25,transcript.ilike.%25"+searchQuery+"%25")
       .limit(5) as { data: SearchResult[] | null; error: unknown };
     setResults(result.data ?? []);
   };
 
   useEffect(() => {
+    if (!mounted) return;
     clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => handleSearch(query), 300);
     return () => clearTimeout(timerRef.current);
-  }, [query]);
+  }, [query, mounted]);
 
   const handleLogout = async () => {
+    const supabase = getSupabase();
+    if (!supabase) return;
     await supabase.auth.signOut();
     router.refresh();
   };
