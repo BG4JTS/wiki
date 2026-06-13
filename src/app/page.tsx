@@ -10,6 +10,7 @@ interface EpisodeItem {
   publish_date: string;
   duration: number;
   description: string;
+  status: string;
 }
 
 export default async function HomePage({
@@ -28,9 +29,10 @@ export default async function HomePage({
   try {
     const epResult = await supabase
       .from("episodes")
-      .select("id, episode_number, title, publish_date, duration, description", {
+      .select("id, episode_number, title, publish_date, duration, description, status", {
         count: "exact",
       })
+      .eq("status", "published")
       .order("episode_number", { ascending: false })
       .range(from, to);
     episodes = (epResult.data ?? []) as EpisodeItem[];
@@ -39,12 +41,15 @@ export default async function HomePage({
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">节目列表</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold">节目列表</h1>
+        <Link href="/episodes/new" className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700">+ 提节目</Link>
+      </div>
 
       {episodes.length === 0 ? (
         <div className="text-center py-20 text-gray-400">
           <p className="text-lg mb-2">暂无节目</p>
-          <p className="text-sm">数据库中尚未添加任何节目，请通过管理后台添加。</p>
+          <p className="text-sm">还没有已发布的节目，<Link href="/episodes/new" className="text-indigo-500 hover:underline">来提第一个</Link></p>
         </div>
       ) : (
         <div className="space-y-4">

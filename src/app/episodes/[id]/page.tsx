@@ -5,6 +5,7 @@ import TimelineViewer from "@/components/TimelineViewer";
 import CommentsSection from "@/components/CommentsSection";
 import UserContributions from "@/components/UserContributions";
 import PitSection from "@/components/PitSection";
+import WikiEditor from "@/components/WikiEditor";
 
 // ---- 类型定义 ----
 interface EpisodeData {
@@ -15,6 +16,7 @@ interface EpisodeData {
   duration: number;
   description: string;
   transcript: string;
+  status: string;
 }
 
 interface TimelineData {
@@ -58,9 +60,16 @@ export default async function EpisodePage({
   }
   if (!episode) notFound();
 
+  const isDraft = episode.status === "draft";
+
   return (
     <div>
       <div className="mb-8">
+        {isDraft && (
+          <span className="inline-block text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700 mb-2">
+            📝 草稿 — 欢迎补充完善
+          </span>
+        )}
         <div className="flex items-baseline gap-3 mb-2">
           <span className="text-indigo-600 font-mono">
             #{episode.episode_number}
@@ -73,6 +82,8 @@ export default async function EpisodePage({
         </div>
         <p className="text-gray-600">{episode.description}</p>
       </div>
+
+      <WikiEditor episode={episode} />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-8">

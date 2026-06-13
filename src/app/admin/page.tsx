@@ -8,6 +8,7 @@ interface AdminEpisodeItem {
   id: number;
   episode_number: number;
   title: string;
+  status: string;
 }
 
 export default async function AdminPage() {
@@ -30,7 +31,7 @@ export default async function AdminPage() {
   try {
     const epResult = await supabase
       .from("episodes")
-      .select("id, episode_number, title")
+      .select("id, episode_number, title, status")
       .order("episode_number", { ascending: false });
     episodes = (epResult.data ?? []) as AdminEpisodeItem[];
   } catch {
