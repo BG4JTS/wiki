@@ -20,6 +20,11 @@ export default function NewEpisodePage() {
  const handleSubmit = async () => {
   if (!title.trim()) { setMessage("至少填个标题"); return; }
   setLoading(true); setMessage("");
+  // 检查期号是否已存在
+  if (epNum) {
+   const cr = await supabase.from("episodes").select("id").eq("episode_number", parseInt(epNum)).limit(1) as unknown as { data: { id: number }[] | null; error: unknown };
+   if (cr.data && cr.data.length > 0) { setMessage("期号 #" + epNum + " 已存在"); setLoading(false); return; }
+  }
   // 检查自动审核设置
   let status = "draft";
   try {
