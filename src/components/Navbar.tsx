@@ -112,6 +112,7 @@ export default function Navbar() {
      <Link href="/episodes/new" className="btn btn-ghost text-xs">+ 提节目</Link>
      <Link href="/pits" className="btn btn-ghost text-xs">🕳 坑</Link>
      <Link href="/topics" className="btn btn-ghost text-xs">📋 选题</Link>
+          <Link href="/about" className="btn btn-ghost text-xs">关于</Link>
     </div>
 
     {/* 期号直达 */}
