@@ -88,6 +88,7 @@ export interface Pit {
   description: string;
   status: "open" | "pending" | "filled";
   timestamp_sec: number | null;
+  best_fill_id: number | null;
   up_votes: number;
   down_votes: number;
   created_at: string;
@@ -126,5 +127,6 @@ export type Database = {
     CompositeTypes: Record<string, never>;
   };
 };
+
 
 

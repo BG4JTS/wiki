@@ -10,7 +10,7 @@ import FillSection from "@/components/FillSection";
 interface PitData {
   id: number; episode_id: number | null; timestamp_sec: number | null;
   user_id: string; title: string; description: string;
-  status: string; up_votes: number; down_votes: number; created_at: string;
+  status: string; up_votes: number; down_votes: number; best_fill_id: number | null; created_at: string;
 }
 interface FillData {
   id: number; pit_id: number; episode_id: number | null; timestamp_sec: number | null;
@@ -61,6 +61,11 @@ export default function PitDetailPage() {
 
   useEffect(() => { load(); }, [id]);
 
+  const setBestFill = async (fillId: number) => {
+    await (supabase.from("pits").update({ best_fill_id: fillId } as never).eq("id", id)) as unknown as { error: unknown };
+    load();
+  };
+
   const handleStatusChange = (newStatus: string) => {
     if (pit) setPit({ ...pit, status: newStatus });
   };
@@ -91,7 +96,8 @@ export default function PitDetailPage() {
       </div>
 
       <FillSection pitId={pit.id} pitStatus={pit.status} fills={fills}
-        fillEpisodes={fillEps} userId={userId} onVoted={handleFillVoted} />
+        fillEpisodes={fillEps} userId={userId} ownerId={pit.user_id} bestFillId={pit.best_fill_id}
+        onSetBest={setBestFill} onVoted={handleFillVoted} />
     </div>
   );
 }
