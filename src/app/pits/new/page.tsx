@@ -11,6 +11,7 @@ export default function NewPitPage() {
   const [description, setDescription] = useState("");
   const [episodeId, setEpisodeId] = useState("");
   const [error, setError] = useState("");
+  const [timestampSec, setTimestampSec] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
@@ -21,6 +22,7 @@ export default function NewPitPage() {
       title: title.trim(),
       description: description.trim(),
       episode_id: episodeId ? parseInt(episodeId) : null,
+      timestamp_sec: timestampSec ? parseInt(timestampSec) : null,
       user_id: (await supabase.auth.getUser()).data.user?.id,
     } as never);
     if (err) { setError(err.message); setLoading(false); return; }
@@ -47,6 +49,11 @@ export default function NewPitPage() {
           <label className="block text-sm font-medium mb-1">关联节目 ID（可选）</label>
           <input type="number" value={episodeId} onChange={e => setEpisodeId(e.target.value)}
             placeholder="例如：5" className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">时间戳（秒，可选）</label>
+          <input type="number" value={timestampSec} onChange={e => setTimestampSec(e.target.value)}
+            placeholder="例如：3600" className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400" />
         </div>
         <button onClick={handleSubmit} disabled={loading}
           className="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50">
