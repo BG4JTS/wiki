@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920, height=1080">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { margin:0; padding:0; background:#0d0d0d; }
+body { font-family:"Inter","Noto Sans SC",sans-serif; }
+
+.section { position:absolute; inset:0; opacity:0; pointer-events:none; }
+
+#sec-title { z-index:10; display:flex; align-items:center; justify-content:center; flex-direction:column; }
+#main-title { font-size:120px; font-weight:800; color:#fff; letter-spacing:-0.03em; line-height:1.15; }
+#main-sub { font-size:38px; font-weight:400; color:#a0aec0; margin-top:12px; letter-spacing:0.08em; }
+#main-credit { font-size:18px; color:#666; margin-top:20px; letter-spacing:0.1em; }
+
+#sec-data { z-index:10; display:flex; align-items:center; justify-content:center; flex-direction:column; }
+#sec-data-header { font-size:18px; color:#666; letter-spacing:0.15em; margin-bottom:48px; }
+.data-row { display:flex; gap:100px; }
+.data-item { text-align:center; opacity:0; transform:scale(0.3) translateY(30px); }
+.data-num { font-size:72px; font-weight:800; color:#fff; font-variant-numeric:tabular-nums; line-height:1.2; }
+.data-label { font-size:20px; color:#777; margin-top:8px; letter-spacing:0.05em; }
+
+.feat-detail { z-index:10; display:flex; align-items:center; justify-content:center; flex-direction:column; }
+.feat-header { font-size:18px; color:#666; letter-spacing:0.15em; margin-bottom:58px; }
+.feat-cols { display:flex; gap:120px; align-items:flex-start; }
+.feat-col { width:340px; text-align:center; opacity:0; transform:translateY(20px); }
+.feat-icon-lg { font-size:64px; margin-bottom:20px; }
+.feat-name { font-size:36px; font-weight:700; color:#fff; margin-bottom:14px; letter-spacing:0.04em; }
+.feat-desc { font-size:19px; color:#8899aa; line-height:1.7; letter-spacing:0.03em; }
+
+#sec-finale { z-index:10; }
+.fin-left { position:absolute; left:260px; top:50%; transform:translateY(-50%); }
+.fin-url { font-size:64px; font-weight:800; color:#fff; letter-spacing:-0.02em; }
+.fin-sub { font-size:20px; color:#666; margin-top:10px; letter-spacing:0.05em; }
+.fin-qr { position:absolute; right:220px; top:50%; transform:translateY(-50%); }
+#qr-img { width:180px; height:180px; background:#fff; padding:8px; border-radius:8px; }
+.fin-copy { position:absolute; bottom:40px; left:0; right:0; text-align:center; }
+.fin-copy-text { font-size:14px; color:#555; letter-spacing:0.05em; line-height:2; }
+
+.dot { position:absolute; border-radius:50%; pointer-events:none; opacity:0; }
+</style>
+</head>
+<body>
+<div data-hf-id="hf-p58t" id="root" data-composition-id="main" data-start="0" data-duration="20" data-width="1920" data-height="1080" style="position:relative;width:1920px;height:1080px;overflow:hidden;background:#0d0d0d;">
+
+<div data-hf-id="hf-nqrc" id="sec-title" class="section clip" data-start="0" data-duration="2.5">
+  <div data-hf-id="hf-83h5" id="main-title">原样WIKI</div>
+  <div data-hf-id="hf-n1ur" id="main-sub">《原来是这样?!》节目资料库</div>
+  <div data-hf-id="hf-5ot0" id="main-credit">bg4jts.cn 出品</div>
+</div>
+
+<div data-hf-id="hf-39vv" id="sec-data" class="section clip" data-start="2.5" data-duration="2.5">
+  <div data-hf-id="hf-d2w8" id="sec-data-header">数据总览</div>
+  <div data-hf-id="hf-255z" class="data-row">
+    <div data-hf-id="hf-fetl" class="data-item" id="di0"><div data-hf-id="hf-ozn8" class="data-num">641+</div><div data-hf-id="hf-vk12" class="data-label">期节目</div></div>
+    <div data-hf-id="hf-en5s" class="data-item" id="di1"><div data-hf-id="hf-keos" class="data-num">3.61亿+</div><div data-hf-id="hf-5ls2" class="data-label">累计播放</div></div>
+    <div data-hf-id="hf-nb1n" class="data-item" id="di2"><div data-hf-id="hf-z172" class="data-num">77万+</div><div data-hf-id="hf-teyb" class="data-label">粉丝</div></div>
+    <div data-hf-id="hf-jcxm" class="data-item" id="di3"><div data-hf-id="hf-fp6g" class="data-num">2014</div><div data-hf-id="hf-1w5j" class="data-label">开播至今</div></div>
+  </div>
+</div>
+
+<div data-hf-id="hf-3v72" id="sec-feat-a" class="section feat-detail clip" data-start="5.0" data-duration="2.8">
+  <div data-hf-id="hf-90uv" class="feat-header">核心功能</div>
+  <div data-hf-id="hf-yh8k" class="feat-cols">
+    <div data-hf-id="hf-dzg4" class="feat-col" id="fal">
+      <div data-hf-id="hf-e2e6" class="feat-icon-lg">📝</div>
+      <div data-hf-id="hf-wfwj" class="feat-name">编辑文稿</div>
+      <div data-hf-id="hf-mufl" class="feat-desc">协作编辑节目文稿、<br data-hf-id="hf-x5px">字幕与简介，支持<br data-hf-id="hf-rsrt">Markdown 格式，<br data-hf-id="hf-szow">自动保存草稿</div>
+    </div>
+    <div data-hf-id="hf-7tma" class="feat-col" id="far">
+      <div data-hf-id="hf-hn5f" class="feat-icon-lg">📖</div>
+      <div data-hf-id="hf-6k1l" class="feat-name">WIKI 编辑</div>
+      <div data-hf-id="hf-8y6f" class="feat-desc">任何人可补充修改<br data-hf-id="hf-sldv">节目信息，版本历史<br data-hf-id="hf-qluq">追踪，审核后上线，<br data-hf-id="hf-q7jp">像维基一样开放</div>
+    </div>
+  </div>
+</div>
+
+<div data-hf-id="hf-t12b" id="sec-feat-b" class="section feat-detail clip" data-start="7.8" data-duration="2.8">
+  <div data-hf-id="hf-utfc" class="feat-header">社区互动</div>
+  <div data-hf-id="hf-f4zg" class="feat-cols">
+    <div data-hf-id="hf-fkmt" class="feat-col" id="fbl">
+      <div data-hf-id="hf-whmu" class="feat-icon-lg">⛏️</div>
+      <div data-hf-id="hf-33jd" class="feat-name">挖坑填坑</div>
+      <div data-hf-id="hf-etwy" class="feat-desc">用户可上传节目中的<br data-hf-id="hf-regs">科普坑，其他人评价<br data-hf-id="hf-r05r">高票坑进入待填列表，<br data-hf-id="hf-p0mm">填坑后可引用节目</div>
+    </div>
+    <div data-hf-id="hf-tq23" class="feat-col" id="fbr">
+      <div data-hf-id="hf-ua61" class="feat-icon-lg">🗳️</div>
+      <div data-hf-id="hf-pim0" class="feat-name">选题投票</div>
+      <div data-hf-id="hf-gdlf" class="feat-desc">用户发布想听的选题，<br data-hf-id="hf-ombl">其他用户投票排序，<br data-hf-id="hf-qsyj">热门选题将被优先<br data-hf-id="hf-r79k">制作成节目</div>
+    </div>
+  </div>
+</div>
+
+<div data-hf-id="hf-7meq" id="sec-feat-c" class="section feat-detail clip" data-start="10.6" data-duration="2.8">
+  <div data-hf-id="hf-hcb9" class="feat-header">播放增强</div>
+  <div data-hf-id="hf-dy2d" class="feat-cols">
+    <div data-hf-id="hf-n36a" class="feat-col" id="fcl">
+      <div data-hf-id="hf-c6f7" class="feat-icon-lg">🎵</div>
+      <div data-hf-id="hf-txp1" class="feat-name">BGM 歌单</div>
+      <div data-hf-id="hf-17fq" class="feat-desc">每个节目独立歌单，<br data-hf-id="hf-q0ch">时间+曲名标注，<br data-hf-id="hf-qeni">任何人可贡献编辑，<br data-hf-id="hf-p7qf">听歌识曲不求人</div>
+    </div>
+    <div data-hf-id="hf-t904" class="feat-col" id="fcr">
+      <div data-hf-id="hf-0f9w" class="feat-icon-lg">⏱️</div>
+      <div data-hf-id="hf-uc5a" class="feat-name">时间轴</div>
+      <div data-hf-id="hf-5bex" class="feat-desc">节目内部导航时间点，<br data-hf-id="hf-pm1g">快速跳转片段，<br data-hf-id="hf-of4d">标记重要知识点，<br data-hf-id="hf-otfe">支持社区共建</div>
+    </div>
+  </div>
+</div>
+
+<div data-hf-id="hf-qjc0" id="sec-feat-d" class="section feat-detail clip" data-start="13.4" data-duration="2.8">
+  <div data-hf-id="hf-tdi0" class="feat-header">便捷功能</div>
+  <div data-hf-id="hf-ecde" class="feat-cols">
+    <div data-hf-id="hf-tilf" class="feat-col" id="fdl">
+      <div data-hf-id="hf-qjep" class="feat-icon-lg">💬</div>
+      <div data-hf-id="hf-cuek" class="feat-name">评论互动</div>
+      <div data-hf-id="hf-0s9m" class="feat-desc">每期节目独立评论区，<br data-hf-id="hf-tzer">支持回复与点赞，<br data-hf-id="hf-udps">用户头像可自定义，<br data-hf-id="hf-7f5s">知识讨论零距离</div>
+    </div>
+    <div data-hf-id="hf-uad9" class="feat-col" id="fdr">
+      <div data-hf-id="hf-e21b" class="feat-icon-lg">🔢</div>
+      <div data-hf-id="hf-zaq4" class="feat-name">期号直达</div>
+      <div data-hf-id="hf-ghmn" class="feat-desc">输入节目编号直接<br data-hf-id="hf-70ur">跳转，不存在的期号<br data-hf-id="hf-2kkm">提示"立即创建？"，<br data-hf-id="hf-269l">比搜索快十倍</div>
+    </div>
+  </div>
+</div>
+
+<div data-hf-id="hf-520q" id="sec-finale" class="section clip" data-start="16.2" data-duration="3.8">
+  <div data-hf-id="hf-cbi3" class="fin-left">
+    <div data-hf-id="hf-7ca5" class="fin-url">w.bg4jts.cn</div>
+    <div data-hf-id="hf-yrc0" class="fin-sub">扫码访问 · 原样WIKI</div>
+  </div>
+  <div data-hf-id="hf-dtpd" class="fin-qr">
+    <img data-hf-id="hf-lpbd" id="qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://w.bg4jts.cn" alt="QR" crossorigin="anonymous">
+  </div>
+  <div data-hf-id="hf-vpzj" class="fin-copy">
+    <div data-hf-id="hf-fjdu" class="fin-copy-text">BG4JTS 保留部分权利<br data-hf-id="hf-1ryk">与《原来是这样?!》节目及上海SMG东方广播中心无任何从属关系</div>
+  </div>
+</div>
+
+<script>
+window.__timelines = window.__timelines || {};
+var tl = gsap.timeline({ paused:true });
+
+var seed = 42;
+function sr() { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }
+var W = 1920, H = 1080;
+var dotEls = [];
+for (var i = 0; i < 200; i++) {
+  var dx = sr() * W, dy = sr() * H, ds = 1 + sr() * 3;
+  var dh = sr() < 0.3 ? 200 : (sr() < 0.4 ? 180 : 0);
+  var dsa = sr() < 0.4 ? "50%" : "0%";
+  var dl = 45 + sr() * 45;
+  var dot = document.createElement("div");
+  dot.className = "dot";
+  dot.style.cssText = "left:"+dx+"px;top:"+dy+"px;width:"+ds+"px;height:"+ds+"px;background:hsl("+dh+","+dsa+","+dl+"%);z-index:1;";
+  dot._x = dx; dot._y = dy;
+  document.getElementById("root").appendChild(dot);
+  dotEls.push(dot);
+}
+function preBurst(t, cx, cy, radius, count) {
+  var used = 0;
+  for (var i = 0; i < dotEls.length && used < count; i++) {
+    var el = dotEls[i], ddx = el._x - cx, ddy = el._y - cy;
+    var dist = Math.sqrt(ddx * ddx + ddy * ddy);
+    if (dist < radius) {
+      var angle = Math.atan2(ddy, ddx);
+      var flyDist = 120 + (i % 200);
+      tl.fromTo(el, { opacity:0, x:0, y:0 }, { opacity:0.9, x:Math.cos(angle)*flyDist, y:Math.sin(angle)*flyDist, duration:2.0, ease:"power2.out", overwrite:"auto" }, t);
+      tl.to(el, { opacity:0, duration:1.5, overwrite:"auto" }, t + 1.6);
+      used++;
+    }
+  }
+}
+for (var p = 0; p < dotEls.length; p++) {
+  if (p % 15 === 0) { tl.to(dotEls[p], { opacity:0.5, duration:0.5, overwrite:"auto" }, 0.5 + (p % 7) * 0.5); tl.to(dotEls[p], { opacity:0.08, duration:0.7, overwrite:"auto" }, 1.2 + (p % 7) * 0.5); }
+  if (p % 20 === 0) { tl.to(dotEls[p], { opacity:0.4, duration:0.6, overwrite:"auto" }, 5 + (p % 5) * 0.4); tl.to(dotEls[p], { opacity:0.08, duration:0.6, overwrite:"auto" }, 6 + (p % 5) * 0.4); }
+  if (p % 17 === 0) { tl.to(dotEls[p], { opacity:0.4, duration:0.5, overwrite:"auto" }, 9 + (p % 5) * 0.3); tl.to(dotEls[p], { opacity:0.08, duration:0.6, overwrite:"auto" }, 10 + (p % 5) * 0.3); }
+  if (p % 19 === 0) { tl.to(dotEls[p], { opacity:0.4, duration:0.5, overwrite:"auto" }, 13 + (p % 5) * 0.3); tl.to(dotEls[p], { opacity:0.08, duration:0.6, overwrite:"auto" }, 14 + (p % 5) * 0.3); }
+}
+
+tl.to("#sec-title", { opacity:1, duration:0.6, ease:"power2.out" }, 0);
+tl.to("#sec-title", { opacity:0, duration:0.4 }, 2.1); tl.set("#sec-title", { opacity:0 }, 2.5);
+
+tl.to("#sec-data", { opacity:1, duration:0.4, ease:"power2.out" }, 2.5);
+tl.to("#sec-data", { opacity:0, duration:0.3 }, 4.7); tl.set("#sec-data", { opacity:0 }, 5.0);
+
+// Data items: scale + bounce stagger
+var dataItems = ["di0","di1","di2","di3"];
+dataItems.forEach(function(id, i) {
+  tl.fromTo(document.getElementById(id), { scale:0.3, y:30, opacity:0 }, { scale:1, y:0, opacity:1, duration:0.6, ease:"back.out(1.7)" }, 2.6 + i * 0.2);
+});
+
+tl.to("#sec-feat-a", { opacity:1, duration:0.4, ease:"power2.out" }, 5.0);
+tl.to("#sec-feat-a", { opacity:0, duration:0.3 }, 7.5); tl.set("#sec-feat-a", { opacity:0 }, 7.8);
+
+tl.to("#sec-feat-b", { opacity:1, duration:0.4, ease:"power2.out" }, 7.8);
+tl.to("#sec-feat-b", { opacity:0, duration:0.3 }, 10.3); tl.set("#sec-feat-b", { opacity:0 }, 10.6);
+
+tl.to("#sec-feat-c", { opacity:1, duration:0.4, ease:"power2.out" }, 10.6);
+tl.to("#sec-feat-c", { opacity:0, duration:0.3 }, 13.1); tl.set("#sec-feat-c", { opacity:0 }, 13.4);
+
+tl.to("#sec-feat-d", { opacity:1, duration:0.4, ease:"power2.out" }, 13.4);
+tl.to("#sec-feat-d", { opacity:0, duration:0.3 }, 15.9); tl.set("#sec-feat-d", { opacity:0 }, 16.2);
+
+tl.to("#sec-finale", { opacity:1, duration:0.5, ease:"power2.out" }, 16.2);
+
+preBurst(0, 960, 540, 300, 50);
+preBurst(2.5, 960, 540, 250, 30);
+preBurst(5.0, 960, 540, 200, 20);
+preBurst(7.8, 960, 540, 200, 20);
+preBurst(10.6, 960, 540, 200, 20);
+preBurst(13.4, 960, 540, 200, 20);
+preBurst(16.2, 960, 540, 400, 80);
+preBurst(18.0, 960, 540, 500, 120);
+
+function featCols(ids, baseT) {
+  ids.forEach(function(id, i) {
+    tl.fromTo(document.getElementById(id), { opacity:0, y:20 }, { opacity:1, y:0, duration:0.45, ease:"power2.out" }, baseT + i * 0.25);
+  });
+}
+featCols(["fal","far"], 5.1);
+featCols(["fbl","fbr"], 7.9);
+featCols(["fcl","fcr"], 10.7);
+featCols(["fdl","fdr"], 13.5);
+
+window.__timelines["main"] = tl;
+</script>
+</div>
+</body>
+</html>
+

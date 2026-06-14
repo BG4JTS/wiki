@@ -99,7 +99,7 @@ export default function ReferenceSection({ episodeId }: { episodeId: number }) {
       ) : (
         <div className="space-y-1.5">
           {refs.map((r) => (
-            <Link key={r.id} href={"/episodes/" + (r.episodes?.id ?? "")} className="flex items-center gap-2 border border-ink-100 p-2 hover:bg-ink-50 transition-colors group">
+            <Link key={r.id} href={"/episodes/" + (r.episodes?.episode_number ?? "")} className="flex items-center gap-2 border border-ink-100 p-2 hover:bg-ink-50 transition-colors group">
               <span className="text-xs font-mono text-primary font-bold min-w-[40px]">#{r.episodes?.episode_number}</span>
               <span className="flex-1 text-xs text-ink-600 truncate">{r.episodes?.title}</span>
               {r.timestamp_sec > 0 && (

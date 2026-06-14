@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920, height=1080">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { margin:0; padding:0; background:#0d0d0d; }
+body { font-family:"Inter","Noto Sans SC",sans-serif; }
+
+.section { position:absolute; inset:0; opacity:0; pointer-events:none; }
+
+#sec-title { z-index:10; display:flex; align-items:center; justify-content:center; flex-direction:column; }
+#main-title { font-size:120px; font-weight:800; color:#fff; letter-spacing:-0.03em; line-height:1.15; }
+#main-sub { font-size:38px; font-weight:400; color:#a0aec0; margin-top:12px; letter-spacing:0.08em; }
+#main-credit { font-size:18px; color:#666; margin-top:20px; letter-spacing:0.1em; }
+
+#sec-data { z-index:10; display:flex; align-items:center; justify-content:center; flex-direction:column; }
+#sec-data-header { font-size:18px; color:#666; letter-spacing:0.15em; margin-bottom:48px; }
+.data-row { display:flex; gap:80px; }
+.data-item { text-align:center; }
+.data-num { font-size:72px; font-weight:800; color:#fff; font-variant-numeric:tabular-nums; line-height:1.2; }
+.data-label { font-size:20px; color:#777; margin-top:8px; letter-spacing:0.05em; }
+
+#sec-episodes { z-index:10; display:flex; align-items:center; justify-content:center; flex-direction:column; }
+#sec-ep-header { font-size:18px; color:#666; letter-spacing:0.15em; margin-bottom:40px; }
+.ep-list { width:900px; }
+.ep-row { display:flex; justify-content:space-between; align-items:baseline; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.06); opacity:0; }
+.ep-num { font-size:24px; font-weight:700; color:#5ac8fa; width:80px; flex-shrink:0; }
+.ep-title { font-size:24px; font-weight:400; color:#e2e8f0; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.ep-date { font-size:18px; color:#666; width:110px; text-align:right; flex-shrink:0; }
+
+#sec-features { z-index:10; display:flex; align-items:center; justify-content:center; flex-direction:column; }
+#sec-feat-header { font-size:18px; color:#666; letter-spacing:0.15em; margin-bottom:40px; }
+.feat-grid { display:grid; grid-template-columns:repeat(4,200px); grid-template-rows:repeat(2,140px); gap:20px; }
+.feat-cell { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); display:flex; align-items:center; justify-content:center; flex-direction:column; opacity:0; transform:scale(0.9); }
+.feat-icon { font-size:36px; margin-bottom:10px; }
+.feat-label { font-size:22px; font-weight:600; color:#e2e8f0; letter-spacing:0.04em; }
+
+#sec-hosts { z-index:10; display:flex; align-items:center; justify-content:center; flex-direction:column; }
+#sec-hosts-header { font-size:18px; color:#666; letter-spacing:0.15em; margin-bottom:44px; }
+.host-row { display:flex; gap:48px; align-items:center; }
+.host-item { text-align:center; opacity:0; }
+.host-avatar { width:80px; height:80px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:30px; font-weight:700; color:#fff; margin-bottom:12px; }
+.host-name { font-size:22px; font-weight:600; color:#fff; letter-spacing:0.05em; }
+.host-more { font-size:18px; color:#666; margin-left:8px; opacity:0; letter-spacing:0.05em; }
+.host-slogan { margin-top:40px; font-size:22px; color:#a0aec0; letter-spacing:0.06em; opacity:0; }
+
+#sec-finale { z-index:10; }
+.fin-left { position:absolute; left:260px; top:50%; transform:translateY(-50%); }
+.fin-url { font-size:64px; font-weight:800; color:#fff; letter-spacing:-0.02em; }
+.fin-sub { font-size:20px; color:#666; margin-top:10px; letter-spacing:0.05em; }
+.fin-qr { position:absolute; right:220px; top:50%; transform:translateY(-50%); }
+#qr-img { width:180px; height:180px; background:#fff; padding:8px; border-radius:8px; }
+.fin-copy { position:absolute; bottom:40px; left:0; right:0; text-align:center; }
+.fin-copy-text { font-size:14px; color:#555; letter-spacing:0.05em; line-height:2; }
+
+.dot { position:absolute; border-radius:50%; pointer-events:none; opacity:0; }
+</style>
+</head>
+<body>
+<div data-hf-id="hf-p58t" id="root" data-composition-id="main" data-start="0" data-duration="20" data-width="1920" data-height="1080" style="position:relative;width:1920px;height:1080px;overflow:hidden;background:#0d0d0d;">
+
+<div data-hf-id="hf-n9n1" id="sec-title" class="section clip" data-start="0" data-duration="2.8">
+  <div data-hf-id="hf-83h5" id="main-title">原样WIKI</div>
+  <div data-hf-id="hf-n1ur" id="main-sub">《原来是这样?!》节目资料库</div>
+  <div data-hf-id="hf-5ot0" id="main-credit">bg4jts.cn 出品</div>
+</div>
+
+<div data-hf-id="hf-l0c9" id="sec-data" class="section clip" data-start="2.8" data-duration="2.8">
+  <div data-hf-id="hf-d2w8" id="sec-data-header">数据总览</div>
+  <div data-hf-id="hf-255z" class="data-row">
+    <div data-hf-id="hf-x76o" class="data-item"><div data-hf-id="hf-ytnc" class="data-num" id="dn1">0</div><div data-hf-id="hf-vk12" class="data-label">期节目</div></div>
+    <div data-hf-id="hf-g61k" class="data-item"><div data-hf-id="hf-dskp" class="data-num" id="dn2">0</div><div data-hf-id="hf-5ls2" class="data-label">累计播放</div></div>
+    <div data-hf-id="hf-ez4h" class="data-item"><div data-hf-id="hf-lf3a" class="data-num" id="dn3">0</div><div data-hf-id="hf-teyb" class="data-label">粉丝</div></div>
+    <div data-hf-id="hf-fdfi" class="data-item"><div data-hf-id="hf-gsqi" class="data-num" id="dn4">2014</div><div data-hf-id="hf-1w5j" class="data-label">开播至今</div></div>
+  </div>
+</div>
+
+<div data-hf-id="hf-1fjl" id="sec-ep1" class="section clip" data-start="5.6" data-duration="2.9">
+  <div data-hf-id="hf-c2bc" id="sec-ep-header">最新节目</div>
+  <div data-hf-id="hf-fxgk" class="ep-list" id="ep-list-1"></div>
+</div>
+
+<div data-hf-id="hf-v3bw" id="sec-ep2" class="section clip" data-start="8.5" data-duration="2.9">
+  <div data-hf-id="hf-mxzk" id="sec-ep-header">最新节目</div>
+  <div data-hf-id="hf-olcf" class="ep-list" id="ep-list-2"></div>
+</div>
+
+<div data-hf-id="hf-t05v" id="sec-features" class="section clip" data-start="11.4" data-duration="2.9">
+  <div data-hf-id="hf-l6vl" id="sec-feat-header">功能一览</div>
+  <div data-hf-id="hf-w25t" class="feat-grid">
+    <div data-hf-id="hf-8iaq" class="feat-cell" id="fc0"><div data-hf-id="hf-20q0" class="feat-icon">📝</div><div data-hf-id="hf-ik9i" class="feat-label">编辑文稿</div></div>
+    <div data-hf-id="hf-cger" class="feat-cell" id="fc1"><div data-hf-id="hf-qkw0" class="feat-icon">⛏️</div><div data-hf-id="hf-brag" class="feat-label">挖坑填坑</div></div>
+    <div data-hf-id="hf-3siw" class="feat-cell" id="fc2"><div data-hf-id="hf-hpav" class="feat-icon">🗳️</div><div data-hf-id="hf-ry6p" class="feat-label">选题投票</div></div>
+    <div data-hf-id="hf-4k6p" class="feat-cell" id="fc3"><div data-hf-id="hf-s5ut" class="feat-icon">🎵</div><div data-hf-id="hf-wzty" class="feat-label">BGM歌单</div></div>
+    <div data-hf-id="hf-vwau" class="feat-cell" id="fc4"><div data-hf-id="hf-76u2" class="feat-icon">⏱️</div><div data-hf-id="hf-0l95" class="feat-label">时间轴</div></div>
+    <div data-hf-id="hf-zuev" class="feat-cell" id="fc5"><div data-hf-id="hf-v9ij" class="feat-icon">💬</div><div data-hf-id="hf-qxtn" class="feat-label">评论</div></div>
+    <div data-hf-id="hf-oyx8" class="feat-cell" id="fc6"><div data-hf-id="hf-4095" class="feat-icon">📖</div><div data-hf-id="hf-127w" class="feat-label">WIKI编辑</div></div>
+    <div data-hf-id="hf-ry6t" class="feat-cell" id="fc7"><div data-hf-id="hf-fcjp" class="feat-icon">🔢</div><div data-hf-id="hf-5jt5" class="feat-label">期号直达</div></div>
+  </div>
+</div>
+
+<div data-hf-id="hf-wkeh" id="sec-hosts" class="section clip" data-start="14.3" data-duration="2.9">
+  <div data-hf-id="hf-p6k3" id="sec-hosts-header">主播团队</div>
+  <div data-hf-id="hf-sq0x" class="host-row">
+    <div data-hf-id="hf-levk" class="host-item" id="h0"><div data-hf-id="hf-o8o8" class="host-avatar" style="background:#5ac8fa">d</div><div data-hf-id="hf-gmew" class="host-name">旭岽</div></div>
+    <div data-hf-id="hf-m6jd" class="host-item" id="h1"><div data-hf-id="hf-1wjb" class="host-avatar" style="background:#b8956b">凌</div><div data-hf-id="hf-1zsm" class="host-name">子凌</div></div>
+    <div data-hf-id="hf-q4ne" class="host-item" id="h2"><div data-hf-id="hf-lzm1" class="host-avatar" style="background:#a78bfa">雯</div><div data-hf-id="hf-n6av" class="host-name">姜雯</div></div>
+    <div data-hf-id="hf-wad7" class="host-item" id="h3"><div data-hf-id="hf-fd67" class="host-avatar" style="background:#34d399">兄</div><div data-hf-id="hf-37sa" class="host-name">水兄</div></div>
+    <div data-hf-id="hf-8svo" class="host-item" id="h4"><div data-hf-id="hf-box5" class="host-avatar" style="background:#f472b6">枫</div><div data-hf-id="hf-mgmn" class="host-name">冰枫</div></div>
+    <div data-hf-id="hf-9kjh" class="host-item" id="h5"><div data-hf-id="hf-wzkm" class="host-avatar" style="background:#fbbf24">羽</div><div data-hf-id="hf-0bsk" class="host-name">洁羽</div></div>
+    <div data-hf-id="hf-18hf" class="host-more" id="host-more">&amp; more ...</div>
+  </div>
+  <div data-hf-id="hf-ymwk" class="host-slogan" id="host-slogan">用科学的声音 讲述世界的故事</div>
+</div>
+
+<div data-hf-id="hf-rq3e" id="sec-finale" class="section clip" data-start="17.2" data-duration="2.8">
+  <div data-hf-id="hf-cbi3" class="fin-left">
+    <div data-hf-id="hf-7ca5" class="fin-url">w.bg4jts.cn</div>
+    <div data-hf-id="hf-yrc0" class="fin-sub">扫码访问 · 原样WIKI</div>
+  </div>
+  <div data-hf-id="hf-dtpd" class="fin-qr">
+    <img data-hf-id="hf-lpbd" id="qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://w.bg4jts.cn" alt="QR" crossorigin="anonymous">
+  </div>
+  <div data-hf-id="hf-vpzj" class="fin-copy">
+    <div data-hf-id="hf-fjdu" class="fin-copy-text">BG4JTS 保留部分权利<br data-hf-id="hf-x5px">与《原来是这样?!》节目及上海SMG东方广播中心无任何从属关系</div>
+  </div>
+</div>
+
+<script>
+window.__timelines = window.__timelines || {};
+var tl = gsap.timeline({ paused:true });
+
+var seed = 42;
+function sr() { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }
+
+var W = 1920, H = 1080;
+var dotEls = [];
+for (var i = 0; i < 200; i++) {
+  var dx = sr() * W, dy = sr() * H, ds = 1 + sr() * 3;
+  var dh = sr() < 0.3 ? 200 : (sr() < 0.4 ? 180 : 0);
+  var dsa = sr() < 0.4 ? "50%" : "0%";
+  var dl = 45 + sr() * 45;
+  var dot = document.createElement("div");
+  dot.className = "dot";
+  dot.style.cssText = "left:"+dx+"px;top:"+dy+"px;width:"+ds+"px;height:"+ds+"px;background:hsl("+dh+","+dsa+","+dl+"%);z-index:1;";
+  dot._x = dx; dot._y = dy;
+  document.getElementById("root").appendChild(dot);
+  dotEls.push(dot);
+}
+
+function preBurst(t, cx, cy, radius, count) {
+  var used = 0;
+  for (var i = 0; i < dotEls.length && used < count; i++) {
+    var el = dotEls[i];
+    var ddx = el._x - cx, ddy = el._y - cy;
+    var dist = Math.sqrt(ddx * ddx + ddy * ddy);
+    if (dist < radius) {
+      var angle = Math.atan2(ddy, ddx);
+      var flyDist = 120 + (i % 200);
+      tl.fromTo(el, { opacity:0, x:0, y:0 }, { opacity:0.9, x:Math.cos(angle)*flyDist, y:Math.sin(angle)*flyDist, duration:2.5, ease:"power2.out", overwrite:"auto" }, t);
+      tl.to(el, { opacity:0, duration:1.5, overwrite:"auto" }, t + 1.8);
+      used++;
+    }
+  }
+}
+
+for (var p = 0; p < dotEls.length; p++) {
+  if (p % 15 === 0) {
+    tl.to(dotEls[p], { opacity:0.5, duration:0.5, overwrite:"auto" }, 0.5 + (p % 7) * 0.5);
+    tl.to(dotEls[p], { opacity:0.08, duration:0.7, overwrite:"auto" }, 1.2 + (p % 7) * 0.5);
+  }
+  if (p % 20 === 0) {
+    tl.to(dotEls[p], { opacity:0.4, duration:0.6, overwrite:"auto" }, 6 + (p % 5) * 0.4);
+    tl.to(dotEls[p], { opacity:0.08, duration:0.6, overwrite:"auto" }, 7 + (p % 5) * 0.4);
+  }
+  if (p % 17 === 0) {
+    tl.to(dotEls[p], { opacity:0.4, duration:0.5, overwrite:"auto" }, 12 + (p % 5) * 0.3);
+    tl.to(dotEls[p], { opacity:0.08, duration:0.6, overwrite:"auto" }, 13 + (p % 5) * 0.3);
+  }
+}
+
+// Section transitions
+tl.to("#sec-title", { opacity:1, duration:0.6, ease:"power2.out" }, 0);
+tl.to("#sec-title", { opacity:0, duration:0.4 }, 2.4);
+tl.set("#sec-title", { opacity:0 }, 2.8);
+
+tl.to("#sec-data", { opacity:1, duration:0.4, ease:"power2.out" }, 2.8);
+tl.to("#sec-data", { opacity:0, duration:0.3 }, 5.3);
+tl.set("#sec-data", { opacity:0 }, 5.6);
+
+tl.to("#sec-ep1", { opacity:1, duration:0.4 }, 5.6);
+tl.to("#sec-ep1", { opacity:0, duration:0.3 }, 8.2);
+tl.set("#sec-ep1", { opacity:0 }, 8.5);
+
+tl.to("#sec-ep2", { opacity:1, duration:0.4 }, 8.5);
+tl.to("#sec-ep2", { opacity:0, duration:0.3 }, 11.1);
+tl.set("#sec-ep2", { opacity:0 }, 11.4);
+
+tl.to("#sec-features", { opacity:1, duration:0.4, ease:"power2.out" }, 11.4);
+tl.to("#sec-features", { opacity:0, duration:0.3 }, 14.0);
+tl.set("#sec-features", { opacity:0 }, 14.3);
+
+tl.to("#sec-hosts", { opacity:1, duration:0.4, ease:"power2.out" }, 14.3);
+tl.to("#sec-hosts", { opacity:0, duration:0.3 }, 16.9);
+tl.set("#sec-hosts", { opacity:0 }, 17.2);
+
+tl.to("#sec-finale", { opacity:1, duration:0.5, ease:"power2.out" }, 17.2);
+
+// Bursts
+preBurst(0, 960, 540, 300, 50);
+preBurst(2.8, 960, 540, 250, 30);
+preBurst(5.6, 960, 540, 200, 25);
+preBurst(8.5, 960, 540, 200, 25);
+preBurst(11.4, 960, 540, 250, 30);
+preBurst(14.3, 960, 540, 200, 25);
+preBurst(17.2, 960, 540, 400, 80);
+preBurst(18.5, 960, 540, 500, 120);
+
+// Number counters
+function numSteps(el, target, startT, dur, steps) {
+  for (var s = 0; s <= steps; s++) {
+    var v = Math.round(target * s / steps);
+    (function(val) { tl.call(function(){ el.textContent = val; }, null, startT + dur * s / steps); })(v);
+  }
+}
+numSteps(document.getElementById("dn1"), 641, 2.8, 2.2, 10);
+numSteps(document.getElementById("dn2"), 361, 2.8, 2.2, 10);
+numSteps(document.getElementById("dn3"), 77, 2.8, 2.2, 10);
+tl.call(function(){ document.getElementById("dn2").textContent = "3.61亿"; }, null, 5.0);
+tl.call(function(){ document.getElementById("dn1").textContent = "641"; }, null, 5.0);
+tl.call(function(){ document.getElementById("dn3").textContent = "77万"; }, null, 5.0);
+
+// Episode lists
+var eps1 = [
+  {num:"001",title:'\u201C2B\u201D\u94C5\u7B14\u7684\u79D8\u5BC6\uFF1F',date:"2014-03-08"},
+  {num:"002",title:'\u5341\u5206\u949F\u98A0\u8986\u4F60\u7684\u661F\u5EA7\u89C2',date:"2014-03-24"},
+  {num:"003",title:'\u7EB8\u53EA\u80FD\u5BF9\u6298\u0039\u6B21\u5417\uFF1F',date:"2014-03-28"},
+  {num:"004",title:'\u90A3\u5F20\u5BF9\u6298\u5230\u592A\u9633\u7684\u7EB8',date:"2014-03-28"},
+  {num:"005",title:'\u4E2D\u56FD\u4E5F\u6709\u5341\u4E8C\u661F\u5EA7',date:"2014-04-02"},
+  {num:"006",title:'\u7EB8\u724C\u80CC\u540E\u7684\u4E8B\u513F',date:"2014-04-09"}
+];
+var eps2 = [
+  {num:"007",title:'\u91CD\u65B0\u8BA4\u8BC6\u4F60\u7684\u5934\u53D1',date:"2014-04-17"},
+  {num:"008",title:'\u732B\u7684\u4E16\u754C\u4F60\u4E0D\u61C2',date:"2014-04-24"},
+  {num:"009",title:'\u72D7\u7684\u4E16\u754C\u592A\u75AF\u72C2',date:"2014-04-30"},
+  {num:"010",title:'\u7B11\u4E3A\u4EC0\u4E48\u4F1A\u4F20\u67D3\uFF1F',date:"2014-05-07"},
+  {num:"番外",title:'\u5FAE\u4FE1\u5E73\u53F0\u6B63\u5F0F\u4E0A\u7EBF\u5566\uFF01',date:"2014-05-13"},
+  {num:"011",title:'\u571F\u8C6A\u65F6\u4EE3\u8BF4\u201C\u9EC4\u91D1\u201D',date:"2014-05-13"}
+];
+
+function buildEpList(id, eps) {
+  var c = document.getElementById(id);
+  eps.forEach(function(e) {
+    var row = document.createElement("div");
+    row.className = "ep-row";
+    row.innerHTML = '<span class="ep-num">#' + e.num + '</span><span class="ep-title">' + e.title + '</span><span class="ep-date">' + e.date + '</span>';
+    c.appendChild(row);
+  });
+}
+buildEpList("ep-list-1", eps1);
+buildEpList("ep-list-2", eps2);
+
+function staggerRows(id, baseT) {
+  var rows = document.getElementById(id).querySelectorAll(".ep-row");
+  rows.forEach(function(r, i) {
+    tl.fromTo(r, { opacity:0, x:-30 }, { opacity:1, x:0, duration:0.4, ease:"power2.out" }, baseT + i * 0.25);
+  });
+}
+staggerRows("ep-list-1", 5.7);
+staggerRows("ep-list-2", 8.6);
+
+// Feature grid
+for (var fi = 0; fi < 8; fi++) {
+  tl.to(document.getElementById("fc" + fi), { opacity:1, scale:1, duration:0.35, ease:"back.out(1.2)" }, 11.5 + fi * 0.12);
+}
+
+// Host team
+for (var hi = 0; hi < 6; hi++) {
+  tl.fromTo(document.getElementById("h" + hi), { opacity:0, y:20 }, { opacity:1, y:0, duration:0.35, ease:"power2.out" }, 14.4 + hi * 0.15);
+}
+tl.to("#host-more", { opacity:1, duration:0.4 }, 15.4);
+tl.to("#host-slogan", { opacity:1, duration:0.5 }, 15.8);
+
+window.__timelines["main"] = tl;
+</script>
+</div>
+</body>
+</html>
