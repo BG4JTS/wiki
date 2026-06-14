@@ -112,6 +112,7 @@ export default function Navbar() {
      <Link href="/episodes/new" className="btn btn-ghost text-xs">+ 提节目</Link>
      <Link href="/pits" className="btn btn-ghost text-xs">🕳 坑</Link>
      <Link href="/topics" className="btn btn-ghost text-xs">📋 选题</Link>
+     <Link href="/collections" className="btn btn-ghost text-xs">📚 合集</Link>
           <Link href="/about" className="btn btn-ghost text-xs">关于</Link>
     </div>
 
@@ -199,6 +200,7 @@ export default function Navbar() {
       <Link href="/episodes/new" className="block px-3 py-2 hover:bg-ink-50 dark:hover:bg-slate-700 text-sm" onClick={()=>setMenuOpen(false)}>+ 提节目</Link>
       <Link href="/pits" className="block px-3 py-2 hover:bg-ink-50 dark:hover:bg-slate-700 text-sm" onClick={()=>setMenuOpen(false)}>🕳 坑</Link>
       <Link href="/topics" className="block px-3 py-2 hover:bg-ink-50 dark:hover:bg-slate-700 text-sm" onClick={()=>setMenuOpen(false)}>📋 选题库</Link>
+      <Link href="/collections" className="block px-3 py-2 hover:bg-ink-50 dark:hover:bg-slate-700 text-sm" onClick={()=>setMenuOpen(false)}>📚 合集</Link>
       <button onClick={() => { toggleTheme(); }} className="w-full text-left px-3 py-2 hover:bg-ink-50 dark:hover:bg-slate-700 text-sm">
        {dark ? "☀️ 亮色模式" : "🌙 暗色模式"}
       </button>
@@ -218,3 +220,4 @@ export default function Navbar() {
   </nav>
  );
 }
+

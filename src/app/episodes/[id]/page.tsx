@@ -7,8 +7,8 @@ import UserContributions from "@/components/UserContributions";
 import PitSection from "@/components/PitSection";
 import BGMPlaylist from "@/components/BGMPlaylist";
 import WikiEditor from "@/components/WikiEditor";
+import CollectionSection from "@/components/CollectionSection";
 
-// ---- 类型定义 ----
 interface EpisodeData {
  id: number;
  episode_number: number;
@@ -28,7 +28,7 @@ interface TimelineData {
  description: string;
 }
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export default async function EpisodePage({
  params,
@@ -63,7 +63,6 @@ export default async function EpisodePage({
 
  return (
   <div className="animate-fade-in-up">
-   {/* Header */}
    <div className="mb-8">
     {isDraft && (
      <span className="badge badge-draft mb-3">草稿 — 欢迎补充完善</span>
@@ -101,15 +100,14 @@ export default async function EpisodePage({
    <WikiEditor episode={episode} />
 
    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-6">
-    {/* 主内容区 */}
     <div className="lg:col-span-2 space-y-10">
      {timelines.length > 0 && <TimelineViewer timelines={timelines} />}
      <BGMPlaylist episodeId={episode.id} />
      <TranscriptViewer transcript={episode.transcript} />
      <CommentsSection episodeId={episode.id} />
     </div>
-    {/* 侧边栏 */}
     <div className="lg:col-span-1 space-y-6">
+     <CollectionSection episodeId={episode.id} />
      <UserContributions episodeId={episode.id} />
      <PitSection episodeId={episode.id} />
     </div>
