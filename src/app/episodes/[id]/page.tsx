@@ -6,6 +6,7 @@ import CommentsSection from "@/components/CommentsSection";
 import UserContributions from "@/components/UserContributions";
 import PitSection from "@/components/PitSection";
 import BGMPlaylist from "@/components/BGMPlaylist";
+import ReferenceSection from "@/components/ReferenceSection";
 import WikiEditor from "@/components/WikiEditor";
 import CollectionSection from "@/components/CollectionSection";
 
@@ -108,6 +109,7 @@ export default async function EpisodePage({
     </div>
     <div className="lg:col-span-1 space-y-6">
      <CollectionSection episodeId={episode.id} />
+     <ReferenceSection episodeId={episode.id} />
      <UserContributions episodeId={episode.id} />
      <PitSection episodeId={episode.id} />
     </div>
