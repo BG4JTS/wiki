@@ -16,7 +16,7 @@ interface FillData {
   id: number; pit_id: number; episode_id: number | null; timestamp_sec: number | null;
   user_id: string; description: string; up_votes: number; down_votes: number; created_at: string;
 }
-interface EpMeta { id: number; title: string; }
+interface EpMeta { id: number; title: string; episode_number: number; }
 
 function formatTime(sec: number | null): string {
   if (sec == null) return "";
@@ -30,8 +30,10 @@ export default function PitDetailPage() {
   const [pit, setPit] = useState<PitData | null>(null);
   const [fills, setFills] = useState<FillData[]>([]);
   const [episodeTitle, setEpisodeTitle] = useState("");
+  const [episodeNum, setEpisodeNum] = useState<number | null>(null);
   const [pitAuthor, setPitAuthor] = useState<{username:string;avatar_url:string}|null>(null);
   const [fillEps, setFillEps] = useState<Map<number, string>>(new Map());
+  const [fillEpNums, setFillEpNums] = useState<Map<number, number>>(new Map());
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -48,8 +50,8 @@ export default function PitDetailPage() {
     }
 
     if (r.data.episode_id) {
-      const ep = await supabase.from("episodes").select("title").eq("id", r.data.episode_id).single() as { data: EpMeta | null; error: unknown };
-      if (ep.data) setEpisodeTitle(ep.data.title);
+      const ep = await supabase.from("episodes").select("title, episode_number").eq("id", r.data.episode_id).single() as { data: EpMeta | null; error: unknown };
+      if (ep.data) { setEpisodeTitle(ep.data.title); setEpisodeNum(ep.data.episode_number); }
     }
 
     const fr = await supabase.from("pit_fills").select("*").eq("pit_id", id).order("up_votes", { ascending: false }) as { data: FillData[] | null; error: unknown };
@@ -58,8 +60,8 @@ export default function PitDetailPage() {
 
     const eids = [...new Set(fdata.filter(f => f.episode_id).map(f => f.episode_id!))];
     if (eids.length > 0) {
-      const epr = await supabase.from("episodes").select("id, title").in("id", eids) as { data: EpMeta[] | null; error: unknown };
-      if (epr.data) setFillEps(new Map(epr.data.map(e => [e.id, e.title])));
+      const epr = await supabase.from("episodes").select("id, title, episode_number").in("id", eids) as { data: EpMeta[] | null; error: unknown };
+      if (epr.data) { setFillEps(new Map(epr.data.map(e => [e.id, e.title]))); setFillEpNums(new Map(epr.data.map(e => [e.id, e.episode_number]))); }
     }
     setLoading(false);
   };
@@ -104,7 +106,7 @@ export default function PitDetailPage() {
         <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm mt-2 text-ink-500">
           {episodeTitle && (
             <span className="flex items-center gap-1">
-              📄 <Link href={`/episodes/${pit.episode_id}`} className="text-brand-500 hover:text-brand-600 font-medium">{episodeTitle}</Link>
+              📄 <Link href={`/episodes/${episodeNum ?? pit.episode_id}`} className="text-brand-500 hover:text-brand-600 font-medium">{episodeTitle}</Link>
             </span>
           )}
           {pit.timestamp_sec != null && (
@@ -116,6 +118,7 @@ export default function PitDetailPage() {
       </div>
 
       <FillSection pitId={pit.id} pitStatus={pit.status} fills={fills}
+        fillEpNums={fillEpNums}
         fillEpisodes={fillEps} userId={userId} ownerId={pit.user_id} bestFillId={pit.best_fill_id}
         onSetBest={setBestFill} onVoted={handleFillVoted} />
     </div>

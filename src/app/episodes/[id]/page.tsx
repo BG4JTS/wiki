@@ -45,7 +45,7 @@ export default async function EpisodePage({
   const epResult = await supabase
    .from("episodes")
    .select("*")
-   .eq("id", id)
+   .eq("episode_number", parseInt(id, 10))
    .single();
   episode = epResult.data as EpisodeData | null;
 

@@ -60,7 +60,7 @@ export default async function CollectionDetailPage({
             const ep = row.episodes;
             if (!ep) return null;
             return (
-              <Link key={ep.id} href={"/episodes/" + ep.id} className="flex items-center gap-4 border-2 border-ink-200 p-4 hover:border-ink-400 transition-colors">
+              <Link key={ep.id} href={"/episodes/" + ep.episode_number} className="flex items-center gap-4 border-2 border-ink-200 p-4 hover:border-ink-400 transition-colors">
                 <span className="text-sm font-mono text-primary font-bold min-w-[60px]">#{ep.episode_number}</span>
                 <span className="flex-1 text-sm font-medium text-ink-700">{ep.title}</span>
                 <span className="text-xs text-ink-400">{ep.publish_date}</span>

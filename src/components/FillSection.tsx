@@ -10,9 +10,9 @@ interface FillItem {
   user_id: string; description: string; up_votes: number; down_votes: number; created_at: string;
 }
 
-export default function FillSection({ pitId, pitStatus, fills, fillEpisodes, userId, ownerId, bestFillId, onSetBest, onVoted }: {
+export default function FillSection({ pitId, pitStatus, fills, fillEpisodes, fillEpNums, userId, ownerId, bestFillId, onSetBest, onVoted }: {
   pitId: number; pitStatus: string; fills: FillItem[];
-  fillEpisodes: Map<number, string>; userId: string | null; ownerId: string | null;
+  fillEpisodes: Map<number, string>; fillEpNums: Map<number, number>; userId: string | null; ownerId: string | null;
   bestFillId: number | null; onSetBest?: (fillId: number) => void; onVoted?: () => void;
 }) {
   const supabase = createClient();
@@ -72,7 +72,7 @@ export default function FillSection({ pitId, pitStatus, fills, fillEpisodes, use
               </div>
               <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-2 text-xs text-ink-400">
                 {f.episode_id && fillEpisodes.get(f.episode_id) && (
-                  <Link href={"/episodes/"+f.episode_id} className="text-brand-500 hover:text-brand-600 font-medium">📄 {fillEpisodes.get(f.episode_id)}</Link>
+                  <Link href={"/episodes/" + (fillEpNums.get(f.episode_id!) ?? f.episode_id)} className="text-brand-500 hover:text-brand-600 font-medium">📄 {fillEpisodes.get(f.episode_id)}</Link>
                 )}
                 {f.timestamp_sec!=null && <span>⏱ {formatTime(f.timestamp_sec)}</span>}
               </div>
