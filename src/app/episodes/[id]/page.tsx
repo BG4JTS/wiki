@@ -8,6 +8,7 @@ import PitSection from "@/components/PitSection";
 import BGMPlaylist from "@/components/BGMPlaylist";
 import ReferenceSection from "@/components/ReferenceSection";
 import WikiEditor from "@/components/WikiEditor";
+import AddToCollection from "@/components/AddToCollection";
 import CollectionSection from "@/components/CollectionSection";
 
 interface EpisodeData {
@@ -108,6 +109,7 @@ export default async function EpisodePage({
      <CommentsSection episodeId={episode.id} />
     </div>
     <div className="lg:col-span-1 space-y-6">
+     <AddToCollection episodeId={episode.id} />
      <CollectionSection episodeId={episode.id} />
      <ReferenceSection episodeId={episode.id} />
      <UserContributions episodeId={episode.id} />
